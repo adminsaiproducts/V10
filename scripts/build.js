@@ -1,0 +1,129 @@
+// scripts/build.js - V10 Build Integration Script
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+console.log('🚀 CRM V10 Build Pipeline Starting...\n');
+
+// Step 1: Build Frontend
+console.log('📦 Step 1/4: Building Frontend (Vite)...');
+try {
+  execSync('cd frontend && npm run build', { stdio: 'inherit' });
+  console.log('✅ Frontend build complete\n');
+} catch (error) {
+  console.error('❌ Frontend build failed');
+  process.exit(1);
+}
+
+// Step 2: Build Backend
+console.log('�� Step 2/4: Building Backend (Webpack)...');
+try {
+  execSync('npx webpack', { stdio: 'inherit' });
+  console.log('✅ Backend build complete\n');
+} catch (error) {
+  console.error('❌ Backend build failed');
+  process.exit(1);
+}
+
+// Step 3: Integrate Frontend Assets into HTML
+console.log('🔗 Step 3/4: Integrating Frontend Assets...');
+try {
+  const assetsDir = path.join(__dirname, '..', 'dist', 'assets');
+  const distDir = path.join(__dirname, '..', 'dist');
+  
+  const jsPath = path.join(assetsDir, 'main.js');
+  // CSS might not exist if no styles are used, but usually Vite generates one.
+  // We'll check for it.
+  const cssPath = path.join(assetsDir, 'main.css'); // Vite usually outputs main.css if there are styles
+  // Note: Vite might output assets/index.css or similar depending on config. 
+  // Our vite config says: assetFileNames: '[name].[ext]', and we import index.css in main.tsx usually.
+  // But wait, we didn't check if main.css exists in the previous successful builds.
+  // Let's be safe and check what files are actually there if main.css is missing.
+  
+  if (!fs.existsSync(jsPath)) {
+    throw new Error('main.js not found in dist/assets');
+  }
+  
+  const jsContent = fs.readFileSync(jsPath, 'utf8');
+  let cssContent = '';
+  if (fs.existsSync(cssPath)) {
+    cssContent = fs.readFileSync(cssPath, 'utf8');
+  } else {
+    // Fallback: look for any .css file in assets
+    const files = fs.readdirSync(assetsDir);
+    const cssFile = files.find(f => f.endsWith('.css'));
+    if (cssFile) {
+      cssContent = fs.readFileSync(path.join(assetsDir, cssFile), 'utf8');
+    }
+  }
+  
+  const jsBase64 = Buffer.from(jsContent).toString('base64');
+  const cssBase64 = Buffer.from(cssContent).toString('base64');
+  
+  // Use string concatenation to avoid template literal issues with PowerShell generation
+  let htmlTemplate = '<!DOCTYPE html>\n';
+  htmlTemplate += '<html lang="ja">\n';
+  htmlTemplate += '<head>\n';
+  htmlTemplate += '  <meta charset="UTF-8">\n';
+  htmlTemplate += '  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n';
+  htmlTemplate += '  <title>CRM V10</title>\n';
+  htmlTemplate += '  <script>\n';
+  htmlTemplate += '    const cssBase64 = "' + cssBase64 + '";\n';
+  htmlTemplate += '    if (cssBase64) {\n';
+  htmlTemplate += '      const cssContent = decodeURIComponent(escape(atob(cssBase64)));\n';
+  htmlTemplate += '      const style = document.createElement("style");\n';
+  htmlTemplate += '      style.textContent = cssContent;\n';
+  htmlTemplate += '      document.head.appendChild(style);\n';
+  htmlTemplate += '    }\n';
+  htmlTemplate += '    \n';
+  htmlTemplate += '    const jsBase64 = "' + jsBase64 + '";\n';
+  htmlTemplate += '    const jsContent = decodeURIComponent(escape(atob(jsBase64)));\n';
+  htmlTemplate += '    const script = document.createElement("script");\n';
+  htmlTemplate += '    script.textContent = jsContent;\n';
+  htmlTemplate += '    document.head.appendChild(script);\n';
+  htmlTemplate += '  </script>\n';
+  htmlTemplate += '</head>\n';
+  htmlTemplate += '<body>\n';
+  htmlTemplate += '  <div id="root"></div>\n';
+  htmlTemplate += '</body>\n';
+  htmlTemplate += '</html>';
+  
+  fs.writeFileSync(path.join(distDir, 'index.html'), htmlTemplate, 'utf8');
+  console.log('✅ Frontend assets integrated into index.html\n');
+  
+} catch (error) {
+  console.error('❌ Asset integration failed:', error.message);
+  process.exit(1);
+}
+
+// Step 4: Copy appsscript.json and cleanup
+console.log('🧹 Step 4/4: Finalizing build...');
+try {
+  const appsscriptSrc = path.join(__dirname, '..', 'appsscript.json');
+  const appsscriptDest = path.join(__dirname, '..', 'dist', 'appsscript.json');
+  
+  if (fs.existsSync(appsscriptSrc)) {
+    fs.copyFileSync(appsscriptSrc, appsscriptDest);
+  } else {
+    console.warn('⚠️ appsscript.json not found in root, skipping copy.');
+  }
+  
+  const assetsDir = path.join(__dirname, '..', 'dist', 'assets');
+  if (fs.existsSync(assetsDir)) {
+    try {
+      fs.rmSync(assetsDir, { recursive: true, force: true });
+    } catch (e) {
+      console.warn('⚠️ Could not remove assets directory (might be locked), but build is successful.');
+    }
+  }
+  
+  console.log('✅ Build finalized\n');
+  
+  const distFiles = fs.readdirSync(path.join(__dirname, '..', 'dist'));
+  console.log('📁 dist/ contents:', distFiles.join(', '));
+  console.log('\n✨ Build Complete! Ready for deployment.\n');
+  
+} catch (error) {
+  console.error('❌ Finalization failed:', error.message);
+  process.exit(1);
+}

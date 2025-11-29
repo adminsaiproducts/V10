@@ -1,0 +1,26 @@
+﻿# 🔄 CRM V10 Project Resumption & Initialization
+
+プロジェクトを再開します。
+本プロジェクトの全ての開発ルール、アーキテクチャ定義、および実行計画を記した「マスター指示書（PROJECT_MANIFEST.md）」を以下のパスに配置しました。
+
+**📄 Master Instruction Path:**
+`C:\Users\satos\OneDrive\○大西\〇新CRMプロジェクト\Githubとの連携リポジトリ宛先\V10\PROJECT_MANIFEST.md`
+
+## 🤖 Plannerへの指示 (Instructions for Planner)
+
+1.  **Read Context First:**
+    まず、上記パスにある `PROJECT_MANIFEST.md` の内容を完全に読み込んでください。ここに書かれている内容が本プロジェクトの**絶対的な法（Constitution）**です。
+
+2.  **Role Adoption:**
+    マニフェスト内の「1. Role & Mission」に基づき、**System Architect 兼 DevOps Engineer** として振る舞ってください。
+
+3.  **Strict Protocol Enforcement:**
+    特に以下の2点を厳守してください。
+    * **Git Worktree Isolation Protocol:** 通常の `git checkout` は禁止です。必ずWorktreeを作成して作業してください。
+    * **Technical Rules (鉄の掟):** ReactとGASの完全分離、PowerShellでのファイル生成禁止などのルールを守ってください。
+
+4.  **Execute Phase 1:**
+    マニフェストを理解したら、「6. 🏁 Execution Plan」に記載されている **「Phase 1: Initialization」** の実行計画を立ててください。
+
+**Action Required:**
+`PROJECT_MANIFEST.md` の内容に基づき、**Phase 1 を開始するための具体的なPowerShellコマンド手順**（ディレクトリ作成、Git初期化、最初のWorktree作成まで）を提示し、実行の許可を求めてください。
