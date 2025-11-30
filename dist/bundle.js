@@ -205,10 +205,12 @@ function api_getCustomersPaginated(page, pageSize, sortField, sortOrder) {
         const result = service.getCustomers(page, pageSize);
         return JSON.stringify({
             status: 'success',
-            data: result.data,
-            total: result.total,
-            page: result.page,
-            pageSize: result.pageSize
+            data: {
+                customers: result.data,
+                total: result.total,
+                page: result.page,
+                pageSize: result.pageSize
+            }
         });
     }
     catch (error) {
@@ -242,6 +244,32 @@ function api_searchCustomers(query) {
         });
     }
 }
+/**
+ * API: Get Customer By ID
+ */
+function api_getCustomerById(id) {
+    try {
+        const service = new CustomerService_1.CustomerService();
+        const result = service.getCustomerById(id);
+        if (!result) {
+            return JSON.stringify({
+                status: 'error',
+                message: 'Customer not found'
+            });
+        }
+        return JSON.stringify({
+            status: 'success',
+            data: result
+        });
+    }
+    catch (error) {
+        Logger.log('Error in api_getCustomerById: ' + error.message);
+        return JSON.stringify({
+            status: 'error',
+            message: error.message
+        });
+    }
+}
 // Export functions to globalThis for GAS runtime recognition
 globalThis.doGet = doGet;
 globalThis.doPost = doPost;
@@ -249,6 +277,7 @@ globalThis.include = include;
 globalThis.api_getCustomers = api_getCustomers;
 globalThis.api_getCustomersPaginated = api_getCustomersPaginated;
 globalThis.api_searchCustomers = api_searchCustomers;
+globalThis.api_getCustomerById = api_getCustomerById;
 
 })();
 

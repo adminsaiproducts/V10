@@ -62,36 +62,33 @@ try {
     }
   }
   
-  const jsBase64 = Buffer.from(jsContent).toString('base64');
-  const cssBase64 = Buffer.from(cssContent).toString('base64');
-  
-  // Use string concatenation to avoid template literal issues with PowerShell generation
-  let htmlTemplate = '<!DOCTYPE html>\n';
-  htmlTemplate += '<html lang="ja">\n';
-  htmlTemplate += '<head>\n';
-  htmlTemplate += '  <meta charset="UTF-8">\n';
-  htmlTemplate += '  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n';
-  htmlTemplate += '  <title>CRM V10</title>\n';
-  htmlTemplate += '  <script>\n';
-  htmlTemplate += '    const cssBase64 = "' + cssBase64 + '";\n';
-  htmlTemplate += '    if (cssBase64) {\n';
-  htmlTemplate += '      const cssContent = decodeURIComponent(escape(atob(cssBase64)));\n';
-  htmlTemplate += '      const style = document.createElement("style");\n';
-  htmlTemplate += '      style.textContent = cssContent;\n';
-  htmlTemplate += '      document.head.appendChild(style);\n';
-  htmlTemplate += '    }\n';
-  htmlTemplate += '    \n';
-  htmlTemplate += '    const jsBase64 = "' + jsBase64 + '";\n';
-  htmlTemplate += '    const jsContent = decodeURIComponent(escape(atob(jsBase64)));\n';
-  htmlTemplate += '    const script = document.createElement("script");\n';
-  htmlTemplate += '    script.textContent = jsContent;\n';
-  htmlTemplate += '    document.head.appendChild(script);\n';
-  htmlTemplate += '  </script>\n';
-  htmlTemplate += '</head>\n';
-  htmlTemplate += '<body>\n';
-  htmlTemplate += '  <div id="root"></div>\n';
-  htmlTemplate += '</body>\n';
-  htmlTemplate += '</html>';
+  // Updated to 3-File Pattern (Separated Assets)
+  // 1. index.html (with include tags)
+  // 2. javascript.html (with <script> wrapper)
+  // 3. stylesheet.html (with <style> wrapper)
+
+  // javascript.html
+  const jsTemplate = `<script>\n${jsContent}\n</script>`;
+  fs.writeFileSync(path.join(distDir, 'javascript.html'), jsTemplate, 'utf8');
+
+  // stylesheet.html
+  const cssTemplate = `<style>\n${cssContent}\n</style>`;
+  fs.writeFileSync(path.join(distDir, 'stylesheet.html'), cssTemplate, 'utf8');
+
+  // index.html
+  const htmlTemplate = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRM V10</title>
+  <?!= include('stylesheet'); ?>
+</head>
+<body>
+  <div id="root"></div>
+  <?!= include('javascript'); ?>
+</body>
+</html>`;
   
   fs.writeFileSync(path.join(distDir, 'index.html'), htmlTemplate, 'utf8');
   console.log('✅ Frontend assets integrated into index.html\n');
@@ -116,9 +113,15 @@ try {
   const assetsDir = path.join(__dirname, '..', 'dist', 'assets');
   if (fs.existsSync(assetsDir)) {
     try {
-      fs.rmSync(assetsDir, { recursive: true, force: true });
+      // Try to remove, but don't fail the build if it's locked (common on Windows)
+      // using rimraf from devDependencies if possible, or fs.rmSync
+      try {
+        require('rimraf').sync(assetsDir);
+      } catch (rimrafError) {
+        fs.rmSync(assetsDir, { recursive: true, force: true });
+      }
     } catch (e) {
-      console.warn('⚠️ Could not remove assets directory (might be locked), but build is successful.');
+      console.warn('⚠️ Could not remove assets directory (might be locked), but build is successful. Error: ' + e.message);
     }
   }
   

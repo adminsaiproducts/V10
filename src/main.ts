@@ -85,10 +85,12 @@ function api_getCustomersPaginated(page: number, pageSize: number, sortField?: s
     
     return JSON.stringify({
       status: 'success',
-      data: result.data,
-      total: result.total,
-      page: result.page,
-      pageSize: result.pageSize
+      data: {
+        customers: result.data,
+        total: result.total,
+        page: result.page,
+        pageSize: result.pageSize
+      }
     });
   } catch (error: any) {
     Logger.log('Error in api_getCustomersPaginated: ' + error.message);
@@ -123,6 +125,34 @@ function api_searchCustomers(query: string) {
   }
 }
 
+/**
+ * API: Get Customer By ID
+ */
+function api_getCustomerById(id: string) {
+  try {
+    const service = new CustomerService();
+    const result = service.getCustomerById(id);
+    
+    if (!result) {
+      return JSON.stringify({
+        status: 'error',
+        message: 'Customer not found'
+      });
+    }
+
+    return JSON.stringify({
+      status: 'success',
+      data: result
+    });
+  } catch (error: any) {
+    Logger.log('Error in api_getCustomerById: ' + error.message);
+    return JSON.stringify({
+      status: 'error',
+      message: error.message
+    });
+  }
+}
+
 // Export functions to globalThis for GAS runtime recognition
 (globalThis as any).doGet = doGet;
 (globalThis as any).doPost = doPost;
@@ -130,3 +160,4 @@ function api_searchCustomers(query: string) {
 (globalThis as any).api_getCustomers = api_getCustomers;
 (globalThis as any).api_getCustomersPaginated = api_getCustomersPaginated;
 (globalThis as any).api_searchCustomers = api_searchCustomers;
+(globalThis as any).api_getCustomerById = api_getCustomerById;

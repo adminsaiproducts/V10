@@ -5,6 +5,7 @@ export interface ServerFunctions {
   api_getCustomers: () => string; // Returns JSON string
   api_getCustomersPaginated: (page: number, pageSize: number, sortField?: string, sortOrder?: string) => string;
   api_searchCustomers: (query: string) => string;
+  api_getCustomerById: (id: string) => string;
 }
 
 // Type definition for google.script.run
@@ -66,12 +67,34 @@ const mockResponse = (functionName: string, args: any[]): Promise<any> => {
       
       switch (functionName) {
         case 'api_getCustomers':
-        case 'api_getCustomersPaginated':
         case 'api_searchCustomers':
           resolve([
             { id: 'mock-1', name: 'Mock Customer 1 (Local)', email: 'local1@example.com', status: 'active' },
             { id: 'mock-2', name: 'Mock Customer 2 (Local)', email: 'local2@example.com', status: 'lead' }
           ]);
+          break;
+        case 'api_getCustomersPaginated':
+          resolve({
+            customers: [
+              { id: 'mock-1', name: 'Mock Customer 1 (Local)', email: 'local1@example.com', status: 'active' },
+              { id: 'mock-2', name: 'Mock Customer 2 (Local)', email: 'local2@example.com', status: 'lead' }
+            ],
+            total: 2,
+            page: 1,
+            pageSize: 10
+          });
+          break;
+        case 'api_getCustomerById':
+          const id = args[0];
+          resolve({
+            id: id,
+            name: `Mock Customer ${id} (Local)`,
+            email: `local${id}@example.com`,
+            phone: '090-1234-5678',
+            status: 'active',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          });
           break;
         default:
           resolve(null);
