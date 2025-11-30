@@ -99,6 +99,13 @@ Explicit Global Assignment: scripts/inject-stubs.js でトップレベル関数�
 
 3-File Pattern: HTMLサイズ制限回避のため、JS/CSSを分離デプロイする。
 
+C. GAS Compatibility Settings (Added Fix)
+deployment_handover_report.md の教訓に基づき、以下のコンパイル設定を強制する。
+
+TS Config: tsconfig.json の compilerOptions において、"module": "None" または "module": "CommonJS" を設定すること。ESNext は禁止する（500エラーの原因となる）。
+
+Webpack: output.library.type は設定せず、プレーンなIIFE（即時実行関数）として出力し、inject-stubs.js で補正する。
+
 6. ガバナンスとセキュリティ
 RBAC: Firestoreセキュリティルールによる厳格なアクセス制御。
 
@@ -164,6 +171,8 @@ V10_sandboxes 準備と最初のWorktree作成。
 
 Phase 2: Backend Setup (GAS)
 src/server.ts 作成。
+
+tsconfig.json 設定（module: "None"）。
 
 webpack.config.js 設定。
 

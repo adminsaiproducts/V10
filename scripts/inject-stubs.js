@@ -1,5 +1,5 @@
 /**
- * scripts/add-bridge.js
+ * scripts/inject-stubs.js
  * Appends top-level GAS function stubs to the Webpack-bundled script.
  * This ensures GAS can see the entry points like doGet() and api_Functions().
  */

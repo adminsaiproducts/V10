@@ -6,7 +6,7 @@
   "scripts": {
     "build:backend": "webpack --mode production",
     "build:frontend": "cd frontend && npm run build",
-    "build": "node scripts/build.js",
+    "build": "node scripts/gas-build.js",
     "deploy": "npm run build && clasp push -f",
     "push": "clasp push -f"
   },

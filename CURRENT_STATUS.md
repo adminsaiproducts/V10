@@ -72,6 +72,11 @@ dist/
 
 ## 🔧 既知の課題
 
+### Critical Issues (from deployment_handover_report.md)
+- **Deployment Error:** Web App URLアクセス時に500エラーが発生し、「Google ドキュメント内でエラーが発生しました」と表示される。
+    - **原因:** GAS環境とビルドアーティファクトの適合性問題（特にTS構成とWebpack出力の不整合）。
+    - **対策:** `PROJECT_MANIFEST.md` (Sec 5.C) に基づき、V9構成（`module: "None"`, IIFE出力）への完全回帰を実施する。
+
 ### Technical Debt
 - `clasp push` が "already up to date" を返し続ける問題（手動確認が必要）
 - フロントエンドが Material UI を含まない簡易版（Phase 3 で簡略化）
@@ -86,3 +91,4 @@ dist/
 | :--- | :--- | :--- | :--- |
 | 2025-11-29 | SETUP | `CURRENT_STATUS.md` に変更履歴セクションを追加 | ✅ Done |
 | 2025-11-30 | FEAT | `searchCustomers` API と フロントエンド検索UIの実装 | ✅ Done |
+| 2025-11-30 | FIX | `PROJECT_MANIFEST.md` に基づくスクリプト名変更 (`add-bridge.js` -> `inject-stubs.js`, `build.js` -> `gas-build.js`) と TS/Webpack設定の修正 | ✅ Done |

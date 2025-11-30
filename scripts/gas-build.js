@@ -1,4 +1,4 @@
-// scripts/build.js - V10 Build Integration Script
+// scripts/gas-build.js - V10 Build Integration Script
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
@@ -22,7 +22,7 @@ try {
   
   // ADDED: Bridge Injection for GAS
   console.log('🌉 Injecting GAS Bridge...');
-  execSync('node scripts/add-bridge.js', { stdio: 'inherit' });
+  execSync('node scripts/inject-stubs.js', { stdio: 'inherit' });
   
   console.log('✅ Backend build complete\n');
 } catch (error) {
