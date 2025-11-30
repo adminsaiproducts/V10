@@ -91,6 +91,34 @@ class CustomerService {
         const createdDoc = this.firestore.createDocument(path, docData);
         return this.mapDocumentToCustomer(createdDoc);
     }
+    /**
+     * Update an existing customer
+     */
+    updateCustomer(id, data) {
+        const path = `projects/${this.firestore.projectId}/databases/${this.dbId}/documents/customers/${id}`;
+        // First check if customer exists (optional but good for safety)
+        // In a real app we might skip this round trip if we trust the ID, 
+        // but preserving createdAt requires knowing it or not sending it if updateDocument is a PATCH.
+        // Assuming updateDocument is a full replace or we want to be safe.
+        // Let's fetch to get createdAt if we want to preserve it, or just use the existing one if we had it.
+        // For now, let's just fetch it to be safe and preserve createdAt.
+        const existingDoc = this.firestore.getDocument(path);
+        if (!existingDoc || !existingDoc.fields) {
+            throw new Error(`Customer with ID ${id} not found.`);
+        }
+        const docData = {
+            fields: {
+                name: { stringValue: data.name },
+                email: { stringValue: data.email },
+                phone: { stringValue: data.phone || '' },
+                status: { stringValue: data.status || 'lead' },
+                createdAt: existingDoc.fields.createdAt, // Preserve creation time
+                updatedAt: { timestampValue: new Date().toISOString() }
+            }
+        };
+        const updatedDoc = this.firestore.updateDocument(path, docData);
+        return this.mapDocumentToCustomer(updatedDoc);
+    }
     mapDocumentToCustomer(doc) {
         var _a, _b, _c, _d, _e, _f;
         const fields = doc.fields || {};
@@ -309,6 +337,26 @@ function api_createCustomer(data) {
         });
     }
 }
+/**
+ * API: Update Customer
+ */
+function api_updateCustomer(id, data) {
+    try {
+        const service = new CustomerService_1.CustomerService();
+        const result = service.updateCustomer(id, data);
+        return JSON.stringify({
+            status: 'success',
+            data: result
+        });
+    }
+    catch (error) {
+        Logger.log('Error in api_updateCustomer: ' + error.message);
+        return JSON.stringify({
+            status: 'error',
+            message: error.message
+        });
+    }
+}
 // Export functions to globalThis for GAS runtime recognition
 globalThis.doGet = doGet;
 globalThis.doPost = doPost;
@@ -318,6 +366,7 @@ globalThis.api_getCustomersPaginated = api_getCustomersPaginated;
 globalThis.api_searchCustomers = api_searchCustomers;
 globalThis.api_getCustomerById = api_getCustomerById;
 globalThis.api_createCustomer = api_createCustomer;
+globalThis.api_updateCustomer = api_updateCustomer;
 
 })();
 
@@ -356,4 +405,9 @@ function api_getCustomerById(...args) {
 
 function api_createCustomer(...args) {
   return globalThis.api_createCustomer(...args);
+}
+
+
+function api_updateCustomer(...args) {
+  return globalThis.api_updateCustomer(...args);
 }

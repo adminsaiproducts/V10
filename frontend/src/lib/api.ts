@@ -7,6 +7,7 @@ export interface ServerFunctions {
   api_searchCustomers: (query: string) => string;
   api_getCustomerById: (id: string) => string;
   api_createCustomer: (input: any) => string;
+  api_updateCustomer: (id: string, input: any) => string;
 }
 
 // Type definition for google.script.run
@@ -103,6 +104,16 @@ const mockResponse = (functionName: string, args: any[]): Promise<any> => {
             id: 'new-mock-id-' + Date.now(),
             ...input,
             createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          });
+          break;
+        case 'api_updateCustomer':
+          const updateId = args[0];
+          const updateInput = args[1];
+          resolve({
+            id: updateId,
+            ...updateInput,
+            createdAt: new Date().toISOString(), // In reality, this would be preserved
             updatedAt: new Date().toISOString()
           });
           break;

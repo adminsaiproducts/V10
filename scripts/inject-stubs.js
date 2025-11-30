@@ -19,7 +19,8 @@ const EXPOSED_FUNCTIONS = [
   'api_getCustomersPaginated',
   'api_searchCustomers',
   'api_getCustomerById',
-  'api_createCustomer'
+  'api_createCustomer',
+  'api_updateCustomer'
 ];
 
 function main() {

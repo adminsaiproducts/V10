@@ -41,7 +41,17 @@ const CustomerDetail = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h1>{customer.name}</h1>
-      <Link to="/customers">← Back to List</Link>
+      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <Link to="/customers">← Back to List</Link>
+        <Link to={`/customers/${customer.id}/edit`} style={{
+          backgroundColor: '#ff9800',
+          color: 'white',
+          padding: '5px 10px',
+          textDecoration: 'none',
+          borderRadius: '4px',
+          fontSize: '14px'
+        }}>Edit</Link>
+      </div>
       
       <div style={{ marginTop: '20px', border: '1px solid #ccc', padding: '20px', borderRadius: '5px' }}>
         <p><strong>ID:</strong> {customer.id}</p>
@@ -213,6 +223,7 @@ function App() {
         <Route path="/customers" element={<Customers />} />
         <Route path="/customers/new" element={<CustomerForm />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
+        <Route path="/customers/:id/edit" element={<CustomerForm />} />
       </Routes>
     </HashRouter>
   )
