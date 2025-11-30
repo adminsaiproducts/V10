@@ -26,22 +26,41 @@ export class CustomerService {
    * or relies on simple limit if the library supports it.
    */
   getCustomers(page: number, pageSize: number): CustomerListResponse {
-    // Basic implementation: fetch all (or large limit) and slice
-    // TODO: Optimize with cursor-based pagination when available
+    // Strategy: Accumulative Limit
+    // Since we don't have a reliable cursor or offset in the library wrapper,
+    // we fetch (page * pageSize) items and slice the last page.
+    // This is better than fetching ALL documents, though performance degrades on deep pages.
     
-    // For V10 MVP, we fetch from the 'customers' collection
-    const allDocs = this.firestore.getDocuments(`projects/${this.firestore.projectId}/databases/${this.dbId}/documents/customers`);
-    
-    // Map to Customer interface
-    const customers: Customer[] = allDocs.map((doc: any) => this.mapDocumentToCustomer(doc));
+    const collectionPath = `projects/${this.firestore.projectId}/databases/${this.dbId}/documents/customers`;
+    const fetchLimit = page * pageSize;
 
-    const total = customers.length;
+    // Build Query
+    // We order by createdAt desc to show newest customers first
+    const query = this.firestore.query(collectionPath)
+      .orderBy('createdAt', 'desc')
+      .limit(fetchLimit);
+    
+    // Execute query
+    const docs = query.execute();
+    
+    // Slice results for the requested page
     const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const pagedData = customers.slice(startIndex, endIndex);
+    // docs might be less than fetchLimit if we reached end of collection
+    const pagedDocs = docs.slice(startIndex, startIndex + pageSize);
+
+    // Map to Customer interface
+    const customers: Customer[] = pagedDocs.map((doc: any) => this.mapDocumentToCustomer(doc));
+
+    // Calculate Total Logic
+    // If we received fewer documents than the fetchLimit, we know the exact total is the length of docs.
+    // Otherwise, we don't know the total (it's at least fetchLimit).
+    let total = -1; // -1 indicates "unknown, possibly more"
+    if (docs.length < fetchLimit) {
+      total = docs.length;
+    }
 
     return {
-      data: pagedData,
+      data: customers,
       total: total,
       page,
       pageSize

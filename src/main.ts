@@ -85,18 +85,24 @@ function api_getCustomersPaginated(page: number, pageSize: number, sortField?: s
     
     return JSON.stringify({
       status: 'success',
-      data: result.data,
-      total: result.total,
-      page: result.page,
-      pageSize: result.pageSize
+      data: {
+        items: result.data,
+        total: result.total,
+        page: result.page,
+        pageSize: result.pageSize
+      }
     });
   } catch (error: any) {
     Logger.log('Error in api_getCustomersPaginated: ' + error.message);
     return JSON.stringify({
       status: 'error',
       message: error.message,
-      data: [],
-      total: 0
+      data: {
+        items: [],
+        total: 0,
+        page: page,
+        pageSize: pageSize
+      }
     });
   }
 }

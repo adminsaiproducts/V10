@@ -66,12 +66,24 @@ const mockResponse = (functionName: string, args: any[]): Promise<any> => {
       
       switch (functionName) {
         case 'api_getCustomers':
-        case 'api_getCustomersPaginated':
         case 'api_searchCustomers':
           resolve([
             { id: 'mock-1', name: 'Mock Customer 1 (Local)', email: 'local1@example.com', status: 'active' },
             { id: 'mock-2', name: 'Mock Customer 2 (Local)', email: 'local2@example.com', status: 'lead' }
           ]);
+          break;
+        case 'api_getCustomersPaginated':
+          const page = args[0] || 1;
+          const pageSize = args[1] || 10;
+          resolve({
+            items: [
+              { id: `mock-${page}-1`, name: `Mock Customer 1 (Page ${page})`, email: `page${page}@example.com`, status: 'active' },
+              { id: `mock-${page}-2`, name: `Mock Customer 2 (Page ${page})`, email: `page${page}@example.com`, status: 'lead' }
+            ],
+            total: 25, // Mock total
+            page: page,
+            pageSize: pageSize
+          });
           break;
         default:
           resolve(null);
