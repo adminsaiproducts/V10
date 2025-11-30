@@ -6,6 +6,7 @@ export interface ServerFunctions {
   api_getCustomersPaginated: (page: number, pageSize: number, sortField?: string, sortOrder?: string) => string;
   api_searchCustomers: (query: string) => string;
   api_getCustomerById: (id: string) => string;
+  api_createCustomer: (input: any) => string;
 }
 
 // Type definition for google.script.run
@@ -92,6 +93,15 @@ const mockResponse = (functionName: string, args: any[]): Promise<any> => {
             email: `local${id}@example.com`,
             phone: '090-1234-5678',
             status: 'active',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          });
+          break;
+        case 'api_createCustomer':
+          const input = args[0];
+          resolve({
+            id: 'new-mock-id-' + Date.now(),
+            ...input,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           });

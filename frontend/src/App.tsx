@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { HashRouter, Routes, Route, Link, useParams } from 'react-router-dom'
 import { runGAS } from './lib/api'
 import { ErrorBanner } from './components/ErrorBanner'
+import { CustomerForm } from './components/CustomerForm'
 
 // Simple Customer Detail Component
 const CustomerDetail = () => {
@@ -131,7 +132,16 @@ const Customers = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h1>Customer List</h1>
-      <Link to="/">Back to Home</Link>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Link to="/">Back to Home</Link>
+        <Link to="/customers/new" style={{
+          backgroundColor: '#646cff',
+          color: 'white',
+          padding: '8px 16px',
+          textDecoration: 'none',
+          borderRadius: '4px'
+        }}>+ New Customer</Link>
+      </div>
       
       <form onSubmit={handleSearch} style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
         <input
@@ -201,6 +211,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/customers" element={<Customers />} />
+        <Route path="/customers/new" element={<CustomerForm />} />
         <Route path="/customers/:id" element={<CustomerDetail />} />
       </Routes>
     </HashRouter>
