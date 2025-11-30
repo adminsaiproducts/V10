@@ -80,6 +80,27 @@ export class CustomerService {
       return null;
     }
   }
+  /**
+   * Create a new customer
+   */
+  createCustomer(data: any): Customer {
+    const id = Utilities.getUuid();
+    const path = `projects/${this.firestore.projectId}/databases/${this.dbId}/documents/customers/${id}`;
+    
+    const docData = {
+      fields: {
+        name: { stringValue: data.name },
+        email: { stringValue: data.email },
+        phone: { stringValue: data.phone || '' },
+        status: { stringValue: data.status || 'lead' },
+        createdAt: { timestampValue: new Date().toISOString() },
+        updatedAt: { timestampValue: new Date().toISOString() }
+      }
+    };
+
+    const createdDoc = this.firestore.createDocument(path, docData);
+    return this.mapDocumentToCustomer(createdDoc);
+  }
 
   private mapDocumentToCustomer(doc: any): Customer {
     const fields = doc.fields || {};

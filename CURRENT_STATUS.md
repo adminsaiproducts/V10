@@ -95,3 +95,5 @@ dist/
 | 2025-11-30 | FEAT | 顧客一覧のページネーション実装 (Backend API & Frontend UI) | ✅ Done |
 | 2025-11-30 | FEAT | 顧客詳細画面の実装 (Backend API & Frontend UI) | ✅ Done |
 | 2025-11-30 | FEAT | エラーハンドリングの強化 (ErrorBanner追加, APIエラー対応) | ✅ Done |
+| 2025-11-30 | FIX | `api_getCustomerById` のGASブリッジ欠落修正 (`scripts/inject-stubs.js`) | ✅ Done |
+| 2025-11-30 | FEAT | 顧客作成機能の実装 (Backend: `api_createCustomer`, Frontend: `CustomerForm`) | ✅ Done |

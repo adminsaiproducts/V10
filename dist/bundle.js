@@ -72,6 +72,25 @@ class CustomerService {
             return null;
         }
     }
+    /**
+     * Create a new customer
+     */
+    createCustomer(data) {
+        const id = Utilities.getUuid();
+        const path = `projects/${this.firestore.projectId}/databases/${this.dbId}/documents/customers/${id}`;
+        const docData = {
+            fields: {
+                name: { stringValue: data.name },
+                email: { stringValue: data.email },
+                phone: { stringValue: data.phone || '' },
+                status: { stringValue: data.status || 'lead' },
+                createdAt: { timestampValue: new Date().toISOString() },
+                updatedAt: { timestampValue: new Date().toISOString() }
+            }
+        };
+        const createdDoc = this.firestore.createDocument(path, docData);
+        return this.mapDocumentToCustomer(createdDoc);
+    }
     mapDocumentToCustomer(doc) {
         var _a, _b, _c, _d, _e, _f;
         const fields = doc.fields || {};
@@ -270,6 +289,26 @@ function api_getCustomerById(id) {
         });
     }
 }
+/**
+ * API: Create Customer
+ */
+function api_createCustomer(data) {
+    try {
+        const service = new CustomerService_1.CustomerService();
+        const result = service.createCustomer(data);
+        return JSON.stringify({
+            status: 'success',
+            data: result
+        });
+    }
+    catch (error) {
+        Logger.log('Error in api_createCustomer: ' + error.message);
+        return JSON.stringify({
+            status: 'error',
+            message: error.message
+        });
+    }
+}
 // Export functions to globalThis for GAS runtime recognition
 globalThis.doGet = doGet;
 globalThis.doPost = doPost;
@@ -278,6 +317,7 @@ globalThis.api_getCustomers = api_getCustomers;
 globalThis.api_getCustomersPaginated = api_getCustomersPaginated;
 globalThis.api_searchCustomers = api_searchCustomers;
 globalThis.api_getCustomerById = api_getCustomerById;
+globalThis.api_createCustomer = api_createCustomer;
 
 })();
 
@@ -306,4 +346,14 @@ function api_getCustomersPaginated(...args) {
 
 function api_searchCustomers(...args) {
   return globalThis.api_searchCustomers(...args);
+}
+
+
+function api_getCustomerById(...args) {
+  return globalThis.api_getCustomerById(...args);
+}
+
+
+function api_createCustomer(...args) {
+  return globalThis.api_createCustomer(...args);
 }

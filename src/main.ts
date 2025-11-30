@@ -153,6 +153,27 @@ function api_getCustomerById(id: string) {
   }
 }
 
+/**
+ * API: Create Customer
+ */
+function api_createCustomer(data: any) {
+  try {
+    const service = new CustomerService();
+    const result = service.createCustomer(data);
+    
+    return JSON.stringify({
+      status: 'success',
+      data: result
+    });
+  } catch (error: any) {
+    Logger.log('Error in api_createCustomer: ' + error.message);
+    return JSON.stringify({
+      status: 'error',
+      message: error.message
+    });
+  }
+}
+
 // Export functions to globalThis for GAS runtime recognition
 (globalThis as any).doGet = doGet;
 (globalThis as any).doPost = doPost;
@@ -161,3 +182,4 @@ function api_getCustomerById(id: string) {
 (globalThis as any).api_getCustomersPaginated = api_getCustomersPaginated;
 (globalThis as any).api_searchCustomers = api_searchCustomers;
 (globalThis as any).api_getCustomerById = api_getCustomerById;
+(globalThis as any).api_createCustomer = api_createCustomer;
