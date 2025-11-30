@@ -17,9 +17,13 @@ const Customers = () => {
   const [customers, setCustomers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
-  useEffect(() => {
-    runGAS<any[]>('api_getCustomers')
+  const fetchCustomers = (query: string = '') => {
+    setLoading(true)
+    const apiCall = query ? runGAS<any[]>('api_searchCustomers', query) : runGAS<any[]>('api_getCustomers')
+    
+    apiCall
       .then(data => {
         setCustomers(data)
         setLoading(false)
@@ -28,22 +32,50 @@ const Customers = () => {
         setError(err.message)
         setLoading(false)
       })
+  }
+
+  useEffect(() => {
+    fetchCustomers()
   }, [])
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    fetchCustomers(searchQuery)
+  }
 
   return (
     <div style={{ padding: '20px' }}>
       <h1>Customer List</h1>
       <Link to="/">Back to Home</Link>
-      <ul>
-        {customers.map(c => (
-          <li key={c.id}>
-            <strong>{c.name}</strong> ({c.email}) - {c.status}
-          </li>
-        ))}
-      </ul>
+      
+      <form onSubmit={handleSearch} style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search by name, email, phone..."
+          style={{ padding: '8px', width: '300px', fontSize: '16px' }}
+        />
+        <button type="submit" style={{ padding: '8px 16px', fontSize: '16px', cursor: 'pointer' }}>Search</button>
+      </form>
+
+      {loading ? (
+        <div>Loading...</div>
+      ) : error ? (
+        <div style={{ color: 'red' }}>Error: {error}</div>
+      ) : (
+        <ul>
+          {customers.length === 0 ? (
+            <li>No customers found.</li>
+          ) : (
+            customers.map(c => (
+              <li key={c.id}>
+                <strong>{c.name}</strong> ({c.email}) - {c.status}
+              </li>
+            ))
+          )}
+        </ul>
+      )}
     </div>
   )
 }

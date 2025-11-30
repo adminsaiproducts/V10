@@ -19,6 +19,11 @@ try {
 console.log('�� Step 2/4: Building Backend (Webpack)...');
 try {
   execSync('npx webpack', { stdio: 'inherit' });
+  
+  // ADDED: Bridge Injection for GAS
+  console.log('🌉 Injecting GAS Bridge...');
+  execSync('node scripts/add-bridge.js', { stdio: 'inherit' });
+  
   console.log('✅ Backend build complete\n');
 } catch (error) {
   console.error('❌ Backend build failed');

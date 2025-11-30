@@ -1,57 +1,132 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
 
-;// ./src/services/CustomerService.ts
+/***/ 110:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CustomerService = void 0;
 class CustomerService {
+    constructor() {
+        const props = PropertiesService.getScriptProperties();
+        const email = props.getProperty('FIRESTORE_EMAIL');
+        const key = props.getProperty('FIRESTORE_KEY');
+        const projectId = props.getProperty('FIRESTORE_PROJECT_ID');
+        this.dbId = props.getProperty('FIRESTORE_DATABASE_ID') || '(default)';
+        if (!email || !key || !projectId) {
+            throw new Error('Firestore configuration missing in Script Properties');
+        }
+        this.firestore = FirestoreApp.getFirestore(email, key, projectId);
+    }
     /**
      * Get list of customers with pagination
+     * Note: FirestoreApp library has limited pagination support.
+     * This implementation gets a batch and filters/slices in memory for now,
+     * or relies on simple limit if the library supports it.
      */
     getCustomers(page, pageSize) {
-        // TODO: Replace with actual Firestore call
-        const mockCustomers = [
-            {
-                id: '1',
-                name: '山田 太郎',
-                email: 'taro.yamada@example.com',
-                status: 'active',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            },
-            {
-                id: '2',
-                name: '鈴木 花子',
-                email: 'hanako.suzuki@example.com',
-                status: 'lead',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            }
-        ];
+        // Basic implementation: fetch all (or large limit) and slice
+        // TODO: Optimize with cursor-based pagination when available
+        // For V10 MVP, we fetch from the 'customers' collection
+        const allDocs = this.firestore.getDocuments(`projects/${this.firestore.projectId}/databases/${this.dbId}/documents/customers`);
+        // Map to Customer interface
+        const customers = allDocs.map((doc) => this.mapDocumentToCustomer(doc));
+        const total = customers.length;
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const pagedData = customers.slice(startIndex, endIndex);
         return {
-            data: mockCustomers,
-            total: 2,
+            data: pagedData,
+            total: total,
             page,
             pageSize
         };
     }
     /**
+     * Search customers by name, email, or phone
+     */
+    searchCustomers(query) {
+        const allDocs = this.firestore.getDocuments(`projects/${this.firestore.projectId}/databases/${this.dbId}/documents/customers`);
+        const customers = allDocs.map((doc) => this.mapDocumentToCustomer(doc));
+        if (!query)
+            return customers;
+        const lowerQuery = query.toLowerCase();
+        return customers.filter(c => c.name.toLowerCase().includes(lowerQuery) ||
+            c.email.toLowerCase().includes(lowerQuery) ||
+            (c.phone && c.phone.includes(query)));
+    }
+    /**
      * Get single customer by ID
      */
     getCustomerById(id) {
-        // TODO: Replace with actual Firestore call
+        try {
+            const doc = this.firestore.getDocument(`projects/${this.firestore.projectId}/databases/${this.dbId}/documents/customers/${id}`);
+            if (!doc || !doc.fields)
+                return null;
+            return this.mapDocumentToCustomer(doc);
+        }
+        catch (e) {
+            console.warn(`Customer ${id} not found or error: ${e}`);
+            return null;
+        }
+    }
+    mapDocumentToCustomer(doc) {
+        var _a, _b, _c, _d, _e, _f;
+        const fields = doc.fields || {};
         return {
-            id,
-            name: 'Mock Customer',
-            email: 'mock@example.com',
-            status: 'active',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            id: doc.name.split('/').pop(), // Extract ID from path
+            name: ((_a = fields.name) === null || _a === void 0 ? void 0 : _a.stringValue) || 'Unknown',
+            email: ((_b = fields.email) === null || _b === void 0 ? void 0 : _b.stringValue) || '',
+            phone: (_c = fields.phone) === null || _c === void 0 ? void 0 : _c.stringValue,
+            status: ((_d = fields.status) === null || _d === void 0 ? void 0 : _d.stringValue) || 'lead',
+            createdAt: ((_e = fields.createdAt) === null || _e === void 0 ? void 0 : _e.timestampValue) || new Date().toISOString(),
+            updatedAt: ((_f = fields.updatedAt) === null || _f === void 0 ? void 0 : _f.timestampValue) || new Date().toISOString()
         };
     }
 }
+exports.CustomerService = CustomerService;
 
-;// ./src/server.ts
-// src/server.ts - GAS Entry Point for CRM V10
 
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry needs to be wrapped in an IIFE because it uses a non-standard name for the exports (exports).
+(() => {
+var exports = __webpack_exports__;
+var __webpack_unused_export__;
+
+__webpack_unused_export__ = ({ value: true });
+// src/main.ts - GAS Entry Point for CRM V10 (Aligned with V9 Pattern)
+const CustomerService_1 = __webpack_require__(110);
 /**
  * doGet - Serves the web application
  */
@@ -103,7 +178,7 @@ function include(filename) {
  */
 function api_getCustomers() {
     try {
-        const service = new CustomerService();
+        const service = new CustomerService_1.CustomerService();
         // Default to page 1, size 10 for basic list
         const result = service.getCustomers(1, 10);
         return JSON.stringify({
@@ -126,7 +201,7 @@ function api_getCustomers() {
 function api_getCustomersPaginated(page, pageSize, sortField, sortOrder) {
     try {
         Logger.log(`Pagination: page=${page}, pageSize=${pageSize}, sortField=${sortField || 'none'}, sortOrder=${sortOrder || 'none'}`);
-        const service = new CustomerService();
+        const service = new CustomerService_1.CustomerService();
         const result = service.getCustomers(page, pageSize);
         return JSON.stringify({
             status: 'success',
@@ -146,12 +221,60 @@ function api_getCustomersPaginated(page, pageSize, sortField, sortOrder) {
         });
     }
 }
+/**
+ * API: Search Customers
+ */
+function api_searchCustomers(query) {
+    try {
+        const service = new CustomerService_1.CustomerService();
+        const result = service.searchCustomers(query);
+        return JSON.stringify({
+            status: 'success',
+            data: result
+        });
+    }
+    catch (error) {
+        Logger.log('Error in api_searchCustomers: ' + error.message);
+        return JSON.stringify({
+            status: 'error',
+            message: error.message,
+            data: []
+        });
+    }
+}
 // Export functions to globalThis for GAS runtime recognition
 globalThis.doGet = doGet;
 globalThis.doPost = doPost;
 globalThis.include = include;
 globalThis.api_getCustomers = api_getCustomers;
 globalThis.api_getCustomersPaginated = api_getCustomersPaginated;
+globalThis.api_searchCustomers = api_searchCustomers;
+
+})();
 
 /******/ })()
 ;
+
+function doGet(...args) {
+  return globalThis.doGet(...args);
+}
+
+
+function doPost(...args) {
+  return globalThis.doPost(...args);
+}
+
+
+function api_getCustomers(...args) {
+  return globalThis.api_getCustomers(...args);
+}
+
+
+function api_getCustomersPaginated(...args) {
+  return globalThis.api_getCustomersPaginated(...args);
+}
+
+
+function api_searchCustomers(...args) {
+  return globalThis.api_searchCustomers(...args);
+}

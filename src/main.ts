@@ -1,4 +1,4 @@
-// src/server.ts - GAS Entry Point for CRM V10
+// src/main.ts - GAS Entry Point for CRM V10 (Aligned with V9 Pattern)
 import { CustomerService } from './services/CustomerService';
 
 /**
@@ -101,9 +101,32 @@ function api_getCustomersPaginated(page: number, pageSize: number, sortField?: s
   }
 }
 
+/**
+ * API: Search Customers
+ */
+function api_searchCustomers(query: string) {
+  try {
+    const service = new CustomerService();
+    const result = service.searchCustomers(query);
+    
+    return JSON.stringify({
+      status: 'success',
+      data: result
+    });
+  } catch (error: any) {
+    Logger.log('Error in api_searchCustomers: ' + error.message);
+    return JSON.stringify({
+      status: 'error',
+      message: error.message,
+      data: []
+    });
+  }
+}
+
 // Export functions to globalThis for GAS runtime recognition
 (globalThis as any).doGet = doGet;
 (globalThis as any).doPost = doPost;
 (globalThis as any).include = include;
 (globalThis as any).api_getCustomers = api_getCustomers;
 (globalThis as any).api_getCustomersPaginated = api_getCustomersPaginated;
+(globalThis as any).api_searchCustomers = api_searchCustomers;

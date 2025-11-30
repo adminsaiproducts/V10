@@ -4,6 +4,7 @@
 export interface ServerFunctions {
   api_getCustomers: () => string; // Returns JSON string
   api_getCustomersPaginated: (page: number, pageSize: number, sortField?: string, sortOrder?: string) => string;
+  api_searchCustomers: (query: string) => string;
 }
 
 // Type definition for google.script.run
@@ -66,6 +67,7 @@ const mockResponse = (functionName: string, args: any[]): Promise<any> => {
       switch (functionName) {
         case 'api_getCustomers':
         case 'api_getCustomersPaginated':
+        case 'api_searchCustomers':
           resolve([
             { id: 'mock-1', name: 'Mock Customer 1 (Local)', email: 'local1@example.com', status: 'active' },
             { id: 'mock-2', name: 'Mock Customer 2 (Local)', email: 'local2@example.com', status: 'lead' }

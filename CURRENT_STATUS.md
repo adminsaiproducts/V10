@@ -54,13 +54,15 @@ dist/
 14. **Verification:** ブラウザで実データ表示を確認（10,852件の顧客データ）
 15. **Bridge Injection:** `doPost` 実装と `add-bridge.js` による自動注入の完全化（v133）
 
-## 📝 次のステップ (Phase 4: Usability Enhancement)
+### Phase 4: Usability Enhancement ✅
+16. **Search Functionality:** 顧客検索機能の実装（Backend: `searchCustomers`, Frontend: Search UI）
+
+## 📝 次のステップ (Phase 4: Usability Enhancement - Continued)
 
 ### 優先タスク
-1.  **Search Functionality:** 顧客検索機能の実装（名前、住所、電話番号）
-2.  **Pagination:** 50件制限の解除、ページネーション実装
-3.  **Customer Detail View:** 顧客詳細画面の実装
-4.  **Error Handling:** フロントエンドのエラー表示改善
+1.  **Pagination:** 50件制限の解除、ページネーション実装
+2.  **Customer Detail View:** 顧客詳細画面の実装
+3.  **Error Handling:** フロントエンドのエラー表示改善
 
 ### 将来的な拡張
 - **CRUD Operations:** 顧客の作成・更新・削除機能
@@ -83,3 +85,4 @@ dist/
 | Date | Type | Details | Status |
 | :--- | :--- | :--- | :--- |
 | 2025-11-29 | SETUP | `CURRENT_STATUS.md` に変更履歴セクションを追加 | ✅ Done |
+| 2025-11-30 | FEAT | `searchCustomers` API と フロントエンド検索UIの実装 | ✅ Done |
