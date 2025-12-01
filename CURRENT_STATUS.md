@@ -57,7 +57,14 @@ dist/
 ### Phase 4: Usability Enhancement ✅
 16. **Search Functionality:** 顧客検索機能の実装（Backend: `searchCustomers`, Frontend: Search UI）
 
-## 📝 次のステップ (Phase 4: Usability Enhancement - Continued)
+### Phase 5: Frontend Modernization ✅
+17. **Material UI Integration:** Material UI v5 の導入（@mui/material, @emotion/react, @emotion/styled, @mui/icons-material）
+18. **React Router Integration:** React Router v6 の導入（react-router-dom）
+19. **Build Verification:** Frontend + Backend 統合ビルドの成功確認
+20. **Deployment:** GAS プロジェクトへのデプロイ成功（デプロイID: @5）
+21. **RPA Infrastructure:** Playwright ベースの自動検証スクリプト作成（scripts/verify-deployment.js）
+
+## 📝 次のステップ (Phase 6: UI Enhancement)
 
 ### 優先タスク
 1.  **Pagination:** 50件制限の解除、ページネーション実装 ✅
@@ -79,12 +86,11 @@ dist/
 
 ### Technical Debt
 - `clasp push` が "already up to date" を返し続ける問題（手動確認が必要）
-- フロントエンドが Material UI を含まない簡易版（Phase 3 で簡略化）
 
 ### 改善候補
-- Material UI の再導入（デザイン改善）
-- React Router の再導入（ページ遷移）
-- エラーハンドリングの強化
+- Material UI コンポーネントへの既存UIのリファクタリング
+- React Router によるページ遷移の実装
+- RPA 検証の自動化（CI/CD パイプライン統合）
 
 ## 🕒 最新の変更履歴 (Changelog)
 | Date | Type | Details | Status |
@@ -99,3 +105,6 @@ dist/
 | 2025-11-30 | FEAT | 顧客作成機能の実装 (Backend: `api_createCustomer`, Frontend: `CustomerForm`) | ✅ Done |
 | 2025-11-30 | FEAT | 顧客更新機能の実装 (Backend: `api_updateCustomer`, Frontend: Edit UI) | ✅ Done |
 | 2025-12-01 | FEAT | 住所自動入力機能 (Zipcode Lookup) と住所フィールドの実装 | ✅ Done |
+| 2025-12-02 | FEAT | Phase 5: Frontend Modernization - Material UI & React Router の導入 | ✅ Done |
+| 2025-12-02 | INFRA | Playwright ベースの RPA 検証スクリプト作成 (scripts/verify-deployment.js) | ✅ Done |
+| 2025-12-02 | DEPLOY | GAS プロジェクトへのデプロイ成功（デプロイID: @5） | ✅ Done |
