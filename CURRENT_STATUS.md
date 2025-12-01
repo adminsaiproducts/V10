@@ -1,10 +1,13 @@
 
-| プロパティ名 | 設定値 |
-| :--- | :--- |
-| `FIRESTORE_PROJECT_ID` | `crm-appsheet-v7` |
-| `FIRESTORE_DATABASE_ID` | `crm-database-v9` |
-| `FIRESTORE_EMAIL` | `crm-v7-automation@crm-appsheet-v7.iam.gserviceaccount.com` |
-| `FIRESTORE_KEY` | `config/serviceAccount.json` の `private_key` 全文 |
+| プロパティ名 | 設定値 | 用途 |
+| :--- | :--- | :--- |
+| `FIRESTORE_PROJECT_ID` | `crm-appsheet-v7` | Firestoreプロジェクト識別 |
+| `FIRESTORE_DATABASE_ID` | `crm-database-v9` | Firestoreデータベース識別 |
+| `FIRESTORE_EMAIL` | `crm-v7-automation@crm-appsheet-v7.iam.gserviceaccount.com` | サービスアカウント認証 |
+| `FIRESTORE_KEY` | `config/serviceAccount.json` の `private_key` 全文 | サービスアカウント秘密鍵 |
+| `GOOGLE_MAPS_API_KEY` | `AIzaSyAYUikfoE-EUb187g-5ZemY-P4ZfdMQzlw` | 住所検索 (Geocoding API) |
+
+**注意**: `GOOGLE_MAPS_API_KEY` は CRM V9 System のみに設定されています。Phase 3 Frontend (V10) では未設定です。
 
 ## 🏗️ ビルドシステム構成 (3-File Pattern)
 
@@ -57,18 +60,47 @@ dist/
 ### Phase 4: Usability Enhancement ✅
 16. **Search Functionality:** 顧客検索機能の実装（Backend: `searchCustomers`, Frontend: Search UI）
 
-## 📝 次のステップ (Phase 4: Usability Enhancement - Continued)
+### Phase 5: Advanced Features (In Progress)
+17. **Address Lookup Backend:** 双方向住所検索API実装 (CRM V9 System) ✅
+    - **実装日**: 2025-12-02
+    - **場所**: CRM V9 System (`AddressLookup.gs`)
+    - **API機能**:
+      - `api_getAddressByZipCode(zipCode)`: 郵便番号→住所 (Zipcloud API使用、無料)
+      - `api_getZipCodeByAddress(prefecture, city, address1)`: 住所→郵便番号 (Google Maps Geocoding API使用)
+    - **設定完了**:
+      - Google Cloud Platform: Geocoding API有効化済み
+      - Script Properties: `GOOGLE_MAPS_API_KEY` 設定済み
+      - API Key制限: `script.google.com` のみ許可
+    - **テスト結果**: 全5テスト合格
+      - ✅ 郵便番号→住所検索 (100-0005 → 東京都千代田区丸の内)
+      - ✅ 住所→郵便番号検索 (東京都千代田区丸の内1-9-1 → 1006701)
+      - ✅ 不正入力のエラーハンドリング
+      - ✅ Nullパラメータ処理
+      - ✅ API Key設定確認
+    - **ドキュメント**: `GOOGLE_MAPS_API_SETUP.md`, `ADDRESS_LOOKUP_IMPLEMENTATION.md`
+    - **次のステップ**: フロントエンド実装 (ユーザー選択待ち)
+
+## 📝 次のステップ (Phase 5: Advanced Features - Continued)
 
 ### 優先タスク
+1.  **Address Lookup Frontend:** 住所検索UIの実装 ⏳
+    - **選択肢A**: シンプルなデモページ作成 (15分、低リスク) ← 推奨
+    - **選択肢B**: Phase 3 Frontendに統合 (30-45分、中リスク)
+    - **待機中**: ユーザーの選択待ち
+2.  **End-to-End Testing:** 住所検索機能の完全なテスト ⏸️
+
+### 完了した優先タスク
 1.  **Pagination:** 50件制限の解除、ページネーション実装 ✅
 2.  **Customer Detail View:** 顧客詳細画面の実装 ✅
 3.  **Error Handling:** フロントエンドのエラー表示改善 ✅
+4.  **CRUD Operations:** 顧客の作成・更新機能 ✅
 
 ### 将来的な拡張
-- **CRUD Operations:** 顧客の作成・更新・削除機能
+- **Address Lookup Integration:** 顧客フォームへの住所検索統合 (Backend完了、Frontend保留)
 - **Relationships Display:** 顧客間の関係性表示
 - **Deals Integration:** 顧客に紐づく案件表示
 - **Performance Optimization:** Virtual Scrolling, Cache最適化
+- **Customer Delete:** 顧客削除機能の実装
 
 ## 🔧 既知の課題
 
@@ -99,3 +131,4 @@ dist/
 | 2025-11-30 | FEAT | 顧客作成機能の実装 (Backend: `api_createCustomer`, Frontend: `CustomerForm`) | ✅ Done |
 | 2025-11-30 | FEAT | 顧客更新機能の実装 (Backend: `api_updateCustomer`, Frontend: Edit UI) | ✅ Done |
 | 2025-12-01 | FEAT | 住所自動入力機能 (Zipcode Lookup) と住所フィールドの実装 | ✅ Done |
+| 2025-12-02 | FEAT | 双方向住所検索API実装 (CRM V9 System) - Backend完了 | ✅ Done |
