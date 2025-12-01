@@ -4,6 +4,11 @@ export interface Customer {
   name: string;
   email: string;
   phone?: string;
+  zipCode?: string;
+  prefecture?: string;
+  city?: string;
+  address1?: string; // Street address
+  address2?: string; // Building name, etc.
   status: 'active' | 'inactive' | 'lead';
   createdAt: string;
   updatedAt: string;

@@ -12,6 +12,11 @@ export const CustomerForm = () => {
     name: '',
     email: '',
     phone: '',
+    zipCode: '',
+    prefecture: '',
+    city: '',
+    address1: '',
+    address2: '',
     status: 'lead'
   });
   const [loading, setLoading] = useState(false);
@@ -27,6 +32,11 @@ export const CustomerForm = () => {
             name: data.name,
             email: data.email,
             phone: data.phone || '',
+            zipCode: data.zipCode || '',
+            prefecture: data.prefecture || '',
+            city: data.city || '',
+            address1: data.address1 || '',
+            address2: data.address2 || '',
             status: data.status || 'lead'
           });
           setInitialLoading(false);
@@ -110,6 +120,102 @@ export const CustomerForm = () => {
               onChange={handleChange}
               style={{ width: '100%', padding: '8px', fontSize: '16px' }}
             />
+          </div>
+
+          <div style={{ borderTop: '1px solid #eee', paddingTop: '15px', marginTop: '10px' }}>
+            <h3 style={{ margin: '0 0 15px 0', fontSize: '18px' }}>Address</h3>
+            
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Zip Code</label>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input
+                  type="text"
+                  name="zipCode"
+                  value={formData.zipCode}
+                  onChange={handleChange}
+                  placeholder="123-4567"
+                  style={{ width: '100px', padding: '8px', fontSize: '16px' }}
+                />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!formData.zipCode) return;
+                    try {
+                      const address = await runGAS<any>('api_getAddressByZipCode', formData.zipCode);
+                      if (address) {
+                        setFormData(prev => ({
+                          ...prev,
+                          prefecture: address.prefecture,
+                          city: address.city,
+                          address1: address.address1
+                        }));
+                      } else {
+                        alert('Address not found');
+                      }
+                    } catch (e) {
+                      console.error(e);
+                      alert('Failed to lookup address');
+                    }
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    cursor: 'pointer',
+                    borderRadius: '4px'
+                  }}
+                >
+                  Lookup
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Prefecture</label>
+                <input
+                  type="text"
+                  name="prefecture"
+                  value={formData.prefecture}
+                  onChange={handleChange}
+                  style={{ width: '100%', padding: '8px', fontSize: '16px' }}
+                />
+              </div>
+              <div style={{ flex: 2 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>City</label>
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  style={{ width: '100%', padding: '8px', fontSize: '16px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Address 1 (Street)</label>
+              <input
+                type="text"
+                name="address1"
+                value={formData.address1}
+                onChange={handleChange}
+                style={{ width: '100%', padding: '8px', fontSize: '16px' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Address 2 (Building)</label>
+              <input
+                type="text"
+                name="address2"
+                value={formData.address2}
+                onChange={handleChange}
+                style={{ width: '100%', padding: '8px', fontSize: '16px' }}
+              />
+            </div>
           </div>
 
           <div>

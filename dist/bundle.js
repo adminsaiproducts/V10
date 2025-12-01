@@ -83,6 +83,11 @@ class CustomerService {
                 name: { stringValue: data.name },
                 email: { stringValue: data.email },
                 phone: { stringValue: data.phone || '' },
+                zipCode: { stringValue: data.zipCode || '' },
+                prefecture: { stringValue: data.prefecture || '' },
+                city: { stringValue: data.city || '' },
+                address1: { stringValue: data.address1 || '' },
+                address2: { stringValue: data.address2 || '' },
                 status: { stringValue: data.status || 'lead' },
                 createdAt: { timestampValue: new Date().toISOString() },
                 updatedAt: { timestampValue: new Date().toISOString() }
@@ -111,6 +116,11 @@ class CustomerService {
                 name: { stringValue: data.name },
                 email: { stringValue: data.email },
                 phone: { stringValue: data.phone || '' },
+                zipCode: { stringValue: data.zipCode || '' },
+                prefecture: { stringValue: data.prefecture || '' },
+                city: { stringValue: data.city || '' },
+                address1: { stringValue: data.address1 || '' },
+                address2: { stringValue: data.address2 || '' },
                 status: { stringValue: data.status || 'lead' },
                 createdAt: existingDoc.fields.createdAt, // Preserve creation time
                 updatedAt: { timestampValue: new Date().toISOString() }
@@ -119,17 +129,46 @@ class CustomerService {
         const updatedDoc = this.firestore.updateDocument(path, docData);
         return this.mapDocumentToCustomer(updatedDoc);
     }
+    /**
+     * Fetch address from zip code using external API
+     */
+    getAddressByZipCode(zipCode) {
+        if (!zipCode || zipCode.length < 7)
+            return null;
+        try {
+            const response = UrlFetchApp.fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zipCode}`);
+            const json = JSON.parse(response.getContentText());
+            if (json.status === 200 && json.results && json.results.length > 0) {
+                const result = json.results[0];
+                return {
+                    prefecture: result.address1,
+                    city: result.address2,
+                    address1: result.address3
+                };
+            }
+            return null;
+        }
+        catch (e) {
+            console.warn(`Failed to fetch address for zip code ${zipCode}: ${e}`);
+            return null;
+        }
+    }
     mapDocumentToCustomer(doc) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         const fields = doc.fields || {};
         return {
             id: doc.name.split('/').pop(), // Extract ID from path
             name: ((_a = fields.name) === null || _a === void 0 ? void 0 : _a.stringValue) || 'Unknown',
             email: ((_b = fields.email) === null || _b === void 0 ? void 0 : _b.stringValue) || '',
             phone: (_c = fields.phone) === null || _c === void 0 ? void 0 : _c.stringValue,
-            status: ((_d = fields.status) === null || _d === void 0 ? void 0 : _d.stringValue) || 'lead',
-            createdAt: ((_e = fields.createdAt) === null || _e === void 0 ? void 0 : _e.timestampValue) || new Date().toISOString(),
-            updatedAt: ((_f = fields.updatedAt) === null || _f === void 0 ? void 0 : _f.timestampValue) || new Date().toISOString()
+            zipCode: (_d = fields.zipCode) === null || _d === void 0 ? void 0 : _d.stringValue,
+            prefecture: (_e = fields.prefecture) === null || _e === void 0 ? void 0 : _e.stringValue,
+            city: (_f = fields.city) === null || _f === void 0 ? void 0 : _f.stringValue,
+            address1: (_g = fields.address1) === null || _g === void 0 ? void 0 : _g.stringValue,
+            address2: (_h = fields.address2) === null || _h === void 0 ? void 0 : _h.stringValue,
+            status: ((_j = fields.status) === null || _j === void 0 ? void 0 : _j.stringValue) || 'lead',
+            createdAt: ((_k = fields.createdAt) === null || _k === void 0 ? void 0 : _k.timestampValue) || new Date().toISOString(),
+            updatedAt: ((_l = fields.updatedAt) === null || _l === void 0 ? void 0 : _l.timestampValue) || new Date().toISOString()
         };
     }
 }
@@ -357,6 +396,32 @@ function api_updateCustomer(id, data) {
         });
     }
 }
+/**
+ * API: Get Address by Zip Code
+ */
+function api_getAddressByZipCode(zipCode) {
+    try {
+        const service = new CustomerService_1.CustomerService();
+        const result = service.getAddressByZipCode(zipCode);
+        if (!result) {
+            return JSON.stringify({
+                status: 'error',
+                message: 'Address not found or invalid zip code'
+            });
+        }
+        return JSON.stringify({
+            status: 'success',
+            data: result
+        });
+    }
+    catch (error) {
+        Logger.log('Error in api_getAddressByZipCode: ' + error.message);
+        return JSON.stringify({
+            status: 'error',
+            message: error.message
+        });
+    }
+}
 // Export functions to globalThis for GAS runtime recognition
 globalThis.doGet = doGet;
 globalThis.doPost = doPost;
@@ -367,6 +432,7 @@ globalThis.api_searchCustomers = api_searchCustomers;
 globalThis.api_getCustomerById = api_getCustomerById;
 globalThis.api_createCustomer = api_createCustomer;
 globalThis.api_updateCustomer = api_updateCustomer;
+globalThis.api_getAddressByZipCode = api_getAddressByZipCode;
 
 })();
 
@@ -410,4 +476,9 @@ function api_createCustomer(...args) {
 
 function api_updateCustomer(...args) {
   return globalThis.api_updateCustomer(...args);
+}
+
+
+function api_getAddressByZipCode(...args) {
+  return globalThis.api_getAddressByZipCode(...args);
 }

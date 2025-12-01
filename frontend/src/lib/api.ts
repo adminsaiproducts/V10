@@ -8,6 +8,7 @@ export interface ServerFunctions {
   api_getCustomerById: (id: string) => string;
   api_createCustomer: (input: any) => string;
   api_updateCustomer: (id: string, input: any) => string;
+  api_getAddressByZipCode: (zipCode: string) => string;
 }
 
 // Type definition for google.script.run
@@ -116,6 +117,18 @@ const mockResponse = (functionName: string, args: any[]): Promise<any> => {
             createdAt: new Date().toISOString(), // In reality, this would be preserved
             updatedAt: new Date().toISOString()
           });
+          break;
+        case 'api_getAddressByZipCode':
+          const zipCode = args[0];
+          if (zipCode === '100-0005') {
+            resolve({
+              prefecture: 'Tokyo',
+              city: 'Chiyoda-ku',
+              address1: 'Marunouchi'
+            });
+          } else {
+            resolve(null);
+          }
           break;
         default:
           resolve(null);

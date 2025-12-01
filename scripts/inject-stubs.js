@@ -20,7 +20,8 @@ const EXPOSED_FUNCTIONS = [
   'api_searchCustomers',
   'api_getCustomerById',
   'api_createCustomer',
-  'api_updateCustomer'
+  'api_updateCustomer',
+  'api_getAddressByZipCode'
 ];
 
 function main() {

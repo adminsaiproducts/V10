@@ -195,6 +195,34 @@ function api_updateCustomer(id: string, data: any) {
   }
 }
 
+/**
+ * API: Get Address by Zip Code
+ */
+function api_getAddressByZipCode(zipCode: string) {
+  try {
+    const service = new CustomerService();
+    const result = service.getAddressByZipCode(zipCode);
+    
+    if (!result) {
+      return JSON.stringify({
+        status: 'error',
+        message: 'Address not found or invalid zip code'
+      });
+    }
+
+    return JSON.stringify({
+      status: 'success',
+      data: result
+    });
+  } catch (error: any) {
+    Logger.log('Error in api_getAddressByZipCode: ' + error.message);
+    return JSON.stringify({
+      status: 'error',
+      message: error.message
+    });
+  }
+}
+
 // Export functions to globalThis for GAS runtime recognition
 (globalThis as any).doGet = doGet;
 (globalThis as any).doPost = doPost;
@@ -205,3 +233,4 @@ function api_updateCustomer(id: string, data: any) {
 (globalThis as any).api_getCustomerById = api_getCustomerById;
 (globalThis as any).api_createCustomer = api_createCustomer;
 (globalThis as any).api_updateCustomer = api_updateCustomer;
+(globalThis as any).api_getAddressByZipCode = api_getAddressByZipCode;

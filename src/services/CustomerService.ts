@@ -92,6 +92,11 @@ export class CustomerService {
         name: { stringValue: data.name },
         email: { stringValue: data.email },
         phone: { stringValue: data.phone || '' },
+        zipCode: { stringValue: data.zipCode || '' },
+        prefecture: { stringValue: data.prefecture || '' },
+        city: { stringValue: data.city || '' },
+        address1: { stringValue: data.address1 || '' },
+        address2: { stringValue: data.address2 || '' },
         status: { stringValue: data.status || 'lead' },
         createdAt: { timestampValue: new Date().toISOString() },
         updatedAt: { timestampValue: new Date().toISOString() }
@@ -123,6 +128,11 @@ export class CustomerService {
         name: { stringValue: data.name },
         email: { stringValue: data.email },
         phone: { stringValue: data.phone || '' },
+        zipCode: { stringValue: data.zipCode || '' },
+        prefecture: { stringValue: data.prefecture || '' },
+        city: { stringValue: data.city || '' },
+        address1: { stringValue: data.address1 || '' },
+        address2: { stringValue: data.address2 || '' },
         status: { stringValue: data.status || 'lead' },
         createdAt: existingDoc.fields.createdAt, // Preserve creation time
         updatedAt: { timestampValue: new Date().toISOString() }
@@ -133,6 +143,31 @@ export class CustomerService {
     return this.mapDocumentToCustomer(updatedDoc);
   }
 
+  /**
+   * Fetch address from zip code using external API
+   */
+  getAddressByZipCode(zipCode: string): { prefecture: string; city: string; address1: string } | null {
+    if (!zipCode || zipCode.length < 7) return null;
+
+    try {
+      const response = UrlFetchApp.fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zipCode}`);
+      const json = JSON.parse(response.getContentText());
+
+      if (json.status === 200 && json.results && json.results.length > 0) {
+        const result = json.results[0];
+        return {
+          prefecture: result.address1,
+          city: result.address2,
+          address1: result.address3
+        };
+      }
+      return null;
+    } catch (e) {
+      console.warn(`Failed to fetch address for zip code ${zipCode}: ${e}`);
+      return null;
+    }
+  }
+
   private mapDocumentToCustomer(doc: any): Customer {
     const fields = doc.fields || {};
     return {
@@ -140,6 +175,11 @@ export class CustomerService {
       name: fields.name?.stringValue || 'Unknown',
       email: fields.email?.stringValue || '',
       phone: fields.phone?.stringValue,
+      zipCode: fields.zipCode?.stringValue,
+      prefecture: fields.prefecture?.stringValue,
+      city: fields.city?.stringValue,
+      address1: fields.address1?.stringValue,
+      address2: fields.address2?.stringValue,
       status: (fields.status?.stringValue as any) || 'lead',
       createdAt: fields.createdAt?.timestampValue || new Date().toISOString(),
       updatedAt: fields.updatedAt?.timestampValue || new Date().toISOString()
