@@ -78,16 +78,49 @@ dist/
       - ✅ Nullパラメータ処理
       - ✅ API Key設定確認
     - **ドキュメント**: `GOOGLE_MAPS_API_SETUP.md`, `ADDRESS_LOOKUP_IMPLEMENTATION.md`
-    - **次のステップ**: フロントエンド実装 (ユーザー選択待ち)
+
+18. **Address Lookup Frontend Demo:** デモページ作成 (AI Squad体制) ✅
+    - **実装日**: 2025-12-02
+    - **ファイル**: `address_lookup_demo.html` (紫色グラデーションUI、モダンデザイン)
+    - **Planner (Claude Code) 担当**:
+      - ✅ `address_lookup_demo.html` 作成 (双方向検索UI)
+      - ✅ `DIRECTOR_INSTRUCTIONS.md` 作成 (デプロイ手順書、7タスク、SS1-SS7)
+      - ✅ `AUDITOR_CHECKLIST.md` 作成 (ChatGPT向けレビューチェックリスト)
+      - ✅ `ADDRESS_LOOKUP_DEPLOYMENT.md` 作成 (技術ガイド)
+      - ✅ Git記録 (branch: `feat/address-lookup`, 3 commits)
+    - **Director (RPA/User) 担当**:
+      - ⏳ CRM V9 System へのHTMLファイル追加
+      - ⏳ `doGet` 関数の更新 (デモパラメータ対応)
+      - ⏳ デプロイとURL取得
+      - ⏳ 機能テスト実行 (郵便番号検索、住所検索、エラーハンドリング)
+      - ⏳ スクリーンショット取得 (SS1-SS7)
+      - ⏳ デプロイレポート作成
+    - **Auditor (ChatGPT) 担当**:
+      - ⏳ Director作業のレビュー実施
+      - ⏳ セキュリティ・パフォーマンス・ユーザビリティの検証
+      - ⏳ 改善提案の作成
+      - ⏳ レビューレポート作成
+    - **AI Squad体制**: `PROJECT_MANIFEST.md` Section 1 に基づく役割分担を明確化
 
 ## 📝 次のステップ (Phase 5: Advanced Features - Continued)
 
 ### 優先タスク
-1.  **Address Lookup Frontend:** 住所検索UIの実装 ⏳
-    - **選択肢A**: シンプルなデモページ作成 (15分、低リスク) ← 推奨
-    - **選択肢B**: Phase 3 Frontendに統合 (30-45分、中リスク)
-    - **待機中**: ユーザーの選択待ち
-2.  **End-to-End Testing:** 住所検索機能の完全なテスト ⏸️
+1.  **Address Lookup Demo Deployment:** Director によるデプロイ実行 ⏳
+    - **実行者**: Director (RPA または User)
+    - **手順書**: `DIRECTOR_INSTRUCTIONS.md` を参照
+    - **成果物**: デプロイレポート + スクリーンショット (SS1-SS7)
+    - **次のステップ**: Auditor (ChatGPT) によるレビュー
+
+2.  **Address Lookup Demo Review:** Auditor によるレビュー実行 ⏸️
+    - **実行者**: Auditor (ChatGPT)
+    - **チェックリスト**: `AUDITOR_CHECKLIST.md` を参照
+    - **成果物**: レビューレポート + 改善提案
+    - **次のステップ**: Phase 3 Frontend への統合検討
+
+3.  **Phase 3 Frontend Integration:** 顧客フォームへの住所検索統合 ⏸️
+    - **前提条件**: デモが成功し、Auditor承認済み
+    - **実装内容**: 顧客作成/編集フォームに住所検索UIを追加
+    - **Material UI化**: デザインを Phase 3 Frontend のスタイルに統一
 
 ### 完了した優先タスク
 1.  **Pagination:** 50件制限の解除、ページネーション実装 ✅
@@ -132,3 +165,5 @@ dist/
 | 2025-11-30 | FEAT | 顧客更新機能の実装 (Backend: `api_updateCustomer`, Frontend: Edit UI) | ✅ Done |
 | 2025-12-01 | FEAT | 住所自動入力機能 (Zipcode Lookup) と住所フィールドの実装 | ✅ Done |
 | 2025-12-02 | FEAT | 双方向住所検索API実装 (CRM V9 System) - Backend完了 | ✅ Done |
+| 2025-12-02 | FEAT | 住所検索デモUI作成 (`address_lookup_demo.html`) | ✅ Done |
+| 2025-12-02 | DOC | AI Squad体制の明確化 (`DIRECTOR_INSTRUCTIONS.md`, `AUDITOR_CHECKLIST.md`) | ✅ Done |
