@@ -197,13 +197,14 @@ function api_updateCustomer(id: string, data: any) {
 
 /**
  * API: Get Address by Zip Code
+ * Returns an array of addresses (some zip codes have multiple cities)
  */
 function api_getAddressByZipCode(zipCode: string) {
   try {
     const service = new CustomerService();
-    const result = service.getAddressByZipCode(zipCode);
-    
-    if (!result) {
+    const results = service.getAddressByZipCode(zipCode);
+
+    if (!results || results.length === 0) {
       return JSON.stringify({
         status: 'error',
         message: 'Address not found or invalid zip code'
@@ -212,10 +213,39 @@ function api_getAddressByZipCode(zipCode: string) {
 
     return JSON.stringify({
       status: 'success',
-      data: result
+      data: results // Now returns an array
     });
   } catch (error: any) {
     Logger.log('Error in api_getAddressByZipCode: ' + error.message);
+    return JSON.stringify({
+      status: 'error',
+      message: error.message
+    });
+  }
+}
+
+/**
+ * API: Get Zip Code by Address (Reverse lookup)
+ * Requires GOOGLE_MAPS_API_KEY in Script Properties
+ */
+function api_getZipCodeByAddress(prefecture: string, city: string, address1?: string) {
+  try {
+    const service = new CustomerService();
+    const result = service.getZipCodeByAddress(prefecture, city, address1);
+
+    if (!result) {
+      return JSON.stringify({
+        status: 'error',
+        message: 'Zip code not found for the given address'
+      });
+    }
+
+    return JSON.stringify({
+      status: 'success',
+      data: result
+    });
+  } catch (error: any) {
+    Logger.log('Error in api_getZipCodeByAddress: ' + error.message);
     return JSON.stringify({
       status: 'error',
       message: error.message
@@ -234,3 +264,4 @@ function api_getAddressByZipCode(zipCode: string) {
 (globalThis as any).api_createCustomer = api_createCustomer;
 (globalThis as any).api_updateCustomer = api_updateCustomer;
 (globalThis as any).api_getAddressByZipCode = api_getAddressByZipCode;
+(globalThis as any).api_getZipCodeByAddress = api_getZipCodeByAddress;

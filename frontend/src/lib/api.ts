@@ -9,6 +9,7 @@ export interface ServerFunctions {
   api_createCustomer: (input: any) => string;
   api_updateCustomer: (id: string, input: any) => string;
   api_getAddressByZipCode: (zipCode: string) => string;
+  api_getZipCodeByAddress: (prefecture: string, city: string, address1?: string) => string;
 }
 
 // Type definition for google.script.run
@@ -121,11 +122,27 @@ const mockResponse = (functionName: string, args: any[]): Promise<any> => {
         case 'api_getAddressByZipCode':
           const zipCode = args[0];
           if (zipCode === '100-0005') {
-            resolve({
+            // Mock: Single match
+            resolve([{
               prefecture: 'Tokyo',
               city: 'Chiyoda-ku',
               address1: 'Marunouchi'
-            });
+            }]);
+          } else if (zipCode === '060-0000') {
+            // Mock: Multiple matches
+            resolve([
+              { prefecture: 'Hokkaido', city: 'Sapporo-shi Chuo-ku', address1: '' },
+              { prefecture: 'Hokkaido', city: 'Sapporo-shi Kita-ku', address1: '' }
+            ]);
+          } else {
+            resolve([]);
+          }
+          break;
+        case 'api_getZipCodeByAddress':
+          const prefecture = args[0];
+          const city = args[1];
+          if (prefecture === 'Tokyo' && city === 'Chiyoda-ku') {
+            resolve('1000005');
           } else {
             resolve(null);
           }

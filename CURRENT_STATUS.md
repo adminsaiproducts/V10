@@ -64,7 +64,14 @@ dist/
 20. **Deployment:** GAS プロジェクトへのデプロイ成功（デプロイID: @5）
 21. **RPA Infrastructure:** Playwright ベースの自動検証スクリプト作成（scripts/verify-deployment.js）
 
-## 📝 次のステップ (Phase 6: UI Enhancement)
+### Phase 6: Enhanced Address Lookup ✅
+22. **Bidirectional Address Lookup:** 郵便番号→住所と住所→郵便番号の双方向検索機能実装
+23. **Multiple Candidates UI:** 郵便番号から複数の住所候補がある場合の選択UI実装
+24. **Google Maps Integration:** Google Maps Geocoding API を使用した逆引き（住所→郵便番号）機能
+25. **Backend API Enhancement:** `api_getAddressByZipCode` の配列対応、`api_getZipCodeByAddress` の新規実装
+26. **Deployment:** GAS プロジェクトへのデプロイ成功（デプロイID: @7）
+
+## 📝 次のステップ (Phase 7: UI Enhancement)
 
 ### 優先タスク
 1.  **Pagination:** 50件制限の解除、ページネーション実装 ✅
@@ -108,3 +115,6 @@ dist/
 | 2025-12-02 | FEAT | Phase 5: Frontend Modernization - Material UI & React Router の導入 | ✅ Done |
 | 2025-12-02 | INFRA | Playwright ベースの RPA 検証スクリプト作成 (scripts/verify-deployment.js) | ✅ Done |
 | 2025-12-02 | DEPLOY | GAS プロジェクトへのデプロイ成功（デプロイID: @5） | ✅ Done |
+| 2025-12-02 | FEAT | Phase 6: Enhanced Address Lookup - 双方向検索と複数候補選択UI | ✅ Done |
+| 2025-12-02 | API | 郵便番号→住所（複数候補対応）、住所→郵便番号（Google Maps Geocoding API）の実装 | ✅ Done |
+| 2025-12-02 | DEPLOY | GAS プロジェクトへのデプロイ成功（デプロイID: @7） | ✅ Done |
