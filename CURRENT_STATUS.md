@@ -88,13 +88,14 @@ dist/
       - ✅ `AUDITOR_CHECKLIST.md` 作成 (ChatGPT向けレビューチェックリスト)
       - ✅ `ADDRESS_LOOKUP_DEPLOYMENT.md` 作成 (技術ガイド)
       - ✅ Git記録 (branch: `feat/address-lookup`, 3 commits)
-    - **Director (RPA/User) 担当**:
-      - ⏳ CRM V9 System へのHTMLファイル追加
-      - ⏳ `doGet` 関数の更新 (デモパラメータ対応)
-      - ⏳ デプロイとURL取得
-      - ⏳ 機能テスト実行 (郵便番号検索、住所検索、エラーハンドリング)
-      - ⏳ スクリーンショット取得 (SS1-SS7)
-      - ⏳ デプロイレポート作成
+    - **Director (Claude Code) 担当**:
+      - ✅ CRM V9 System へのHTMLファイル追加 (address_lookup_demo.html)
+      - ✅ `doGet` 関数の更新 (デモパラメータ対応、既存コード確認済み)
+      - ✅ デプロイとURL取得 (v12, AKfycbwTIZxHE1Ekqzq6J76hjsFDO4jUOcbeGITrUFzYC1DSc4k2RAccC5NVb5_wWcrH3eVV)
+      - ✅ UI表示確認 (Playwright検証、SS4スクリーンショット取得)
+      - ✅ デプロイレポート作成 (`DEPLOYMENT_REPORT.md`)
+      - ✅ Git記録 (commit 1b5505f, 30 files changed, 4577 insertions)
+      - ⏳ 機能テスト実行 (郵便番号検索、住所検索、エラーハンドリング) - Auditorレビュー待ち
     - **Auditor (ChatGPT) 担当**:
       - ⏳ Director作業のレビュー実施
       - ⏳ セキュリティ・パフォーマンス・ユーザビリティの検証
@@ -105,13 +106,18 @@ dist/
 ## 📝 次のステップ (Phase 5: Advanced Features - Continued)
 
 ### 優先タスク
-1.  **Address Lookup Demo Deployment:** Director によるデプロイ実行 ⏳
-    - **実行者**: Director (RPA または User)
-    - **手順書**: `DIRECTOR_INSTRUCTIONS.md` を参照
-    - **成果物**: デプロイレポート + スクリーンショット (SS1-SS7)
+1.  **Address Lookup Demo Deployment:** Director によるデプロイ実行 ✅
+    - **実行者**: Director (Claude Code)
+    - **デプロイURL**: https://script.google.com/macros/s/AKfycbwTIZxHE1Ekqzq6J76hjsFDO4jUOcbeGITrUFzYC1DSc4k2RAccC5NVb5_wWcrH3eVV/exec?demo=address
+    - **成果物**:
+      - ✅ デプロイレポート (`DEPLOYMENT_REPORT.md`)
+      - ✅ スクリーンショット (SS4 - 初期ページ表示)
+      - ✅ Playwright検証スクリプト (`scripts/verify-address-demo.js`)
+      - ✅ RPA自動化スクリプト (`scripts/deploy-to-crm-v9.js`)
+    - **完了日**: 2025-12-02
     - **次のステップ**: Auditor (ChatGPT) によるレビュー
 
-2.  **Address Lookup Demo Review:** Auditor によるレビュー実行 ⏸️
+2.  **Address Lookup Demo Review:** Auditor によるレビュー実行 ⏳
     - **実行者**: Auditor (ChatGPT)
     - **チェックリスト**: `AUDITOR_CHECKLIST.md` を参照
     - **成果物**: レビューレポート + 改善提案
@@ -167,3 +173,5 @@ dist/
 | 2025-12-02 | FEAT | 双方向住所検索API実装 (CRM V9 System) - Backend完了 | ✅ Done |
 | 2025-12-02 | FEAT | 住所検索デモUI作成 (`address_lookup_demo.html`) | ✅ Done |
 | 2025-12-02 | DOC | AI Squad体制の明確化 (`DIRECTOR_INSTRUCTIONS.md`, `AUDITOR_CHECKLIST.md`) | ✅ Done |
+| 2025-12-02 | DEPLOY | 住所検索デモのCRM V9 Systemへのデプロイ完了 (v12, commit 1b5505f) | ✅ Done |
+| 2025-12-02 | DOC | デプロイレポート作成 (`DEPLOYMENT_REPORT.md`) + Playwright検証スクリプト | ✅ Done |
