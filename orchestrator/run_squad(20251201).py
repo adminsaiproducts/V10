@@ -15,16 +15,10 @@ def main():
 
     print(f"\n🚀 SQUAD ACTIVATED: Processing request: \"{request}\"\n")
 
-    # --- Phase 1: 🧠 Planner (Claude Code) ---
-    # PlannerをClaude Codeに移管したため表示を修正
-    print("--- [Phase 1] Planner (Claude Code) is thinking... ---")
-    
-    # Claude CodeをPlannerとして機能させるための厳格なSystem Instructionを追加
+    # --- Phase 1: 🧠 Planner (Gemini) ---
+    print("--- [Phase 1] Planner (Gemini) is thinking... ---")
     planner_prompt = f"""
-    あなたはV10プロジェクトのPlanner（Context Architect）です。Builderと同じモデル（Claude Code）を使用していますが、
-    **あなたの唯一の任務は計画の策定であり、絶対にコードを生成してはなりません**。
-    プロジェクトの戦略的使命とマニフェスト（特にGit Worktree Isolation Protocol）を厳守してください。
-
+    あなたはプロジェクトのPlanner（Gemini 3.0 Pro）です。
     ユーザーの要望: {request}
     
     この要望を、Builderが実装すべき具体的な「技術タスクリスト」に分解してください。
@@ -36,7 +30,7 @@ def main():
     # --- Phase 2: 🔨 Builder (Claude) ---
     print("--- [Phase 2] Builder (Claude) is coding... ---")
     builder_prompt = f"""
-    あなたはBuilder（Polyglot Coder / Claude Code）です。
+    あなたはBuilder（Claude Code）です。
     以下のプランに基づいて、必要なコードの変更内容、または具体的な実装コードを提示してください。
     
     プラン:

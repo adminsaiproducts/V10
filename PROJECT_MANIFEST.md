@@ -12,13 +12,13 @@ Branch: main (Protected Source of Truth)
 1. AI協業体制 (Autonomous AI Team: The Squad)
 本プロジェクトは、Python製オーケストレーターを介してAPI接続された、以下の3名の専門AIエージェント（Squad）によって自律的に運営される。
 
-🧠 Planner (Context Architect): Gemini 3.0 Pro
+🧠 Planner (Context Architect): Claude Code (Planner Role)
 
 役割: ユーザーの抽象的な要望を読み解き、Builderが実行可能な具体的な「技術タスクリスト」に分解する。
 
 責任: プロジェクトの方向性維持、Execution Planの策定。
 
-🔨 Builder (Polyglot Coder): Claude Code
+🔨 Builder (Polyglot Coder): Claude Code (Builder Role)
 
 役割: Plannerの設計に基づき、コーディング、テスト、リファクタリング、Git操作を実行する。
 
