@@ -131,25 +131,65 @@ class CustomerService {
     }
     /**
      * Fetch address from zip code using external API
+     * Returns all matching addresses (some zip codes have multiple cities)
      */
     getAddressByZipCode(zipCode) {
         if (!zipCode || zipCode.length < 7)
-            return null;
+            return [];
+        // Remove hyphen if present (e.g., "123-4567" -> "1234567")
+        const cleanZipCode = zipCode.replace(/-/g, '');
         try {
-            const response = UrlFetchApp.fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zipCode}`);
+            const response = UrlFetchApp.fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${cleanZipCode}`);
             const json = JSON.parse(response.getContentText());
             if (json.status === 200 && json.results && json.results.length > 0) {
-                const result = json.results[0];
-                return {
+                // Return all results (some zip codes have multiple cities)
+                return json.results.map((result) => ({
                     prefecture: result.address1,
                     city: result.address2,
                     address1: result.address3
-                };
+                }));
             }
-            return null;
+            return [];
         }
         catch (e) {
             console.warn(`Failed to fetch address for zip code ${zipCode}: ${e}`);
+            return [];
+        }
+    }
+    /**
+     * Reverse lookup: Find zip code from address using Google Maps Geocoding API
+     * Requires GOOGLE_MAPS_API_KEY in Script Properties
+     */
+    getZipCodeByAddress(prefecture, city, address1) {
+        if (!prefecture)
+            return null;
+        try {
+            const props = PropertiesService.getScriptProperties();
+            const apiKey = props.getProperty('GOOGLE_MAPS_API_KEY');
+            if (!apiKey) {
+                console.warn('GOOGLE_MAPS_API_KEY not found in Script Properties. Reverse lookup disabled.');
+                return null;
+            }
+            // Build address string
+            const addressQuery = [prefecture, city, address1].filter(Boolean).join(' ');
+            const encodedAddress = encodeURIComponent(addressQuery);
+            // Call Google Maps Geocoding API
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&language=ja&region=jp&key=${apiKey}`;
+            const response = UrlFetchApp.fetch(url);
+            const json = JSON.parse(response.getContentText());
+            if (json.status === 'OK' && json.results && json.results.length > 0) {
+                const result = json.results[0];
+                // Extract postal code from address components
+                const postalCodeComponent = result.address_components.find((component) => component.types.includes('postal_code'));
+                if (postalCodeComponent) {
+                    return postalCodeComponent.long_name.replace(/-/g, ''); // Remove hyphen
+                }
+            }
+            console.warn(`No postal code found for address: ${addressQuery}`);
+            return null;
+        }
+        catch (e) {
+            console.warn(`Failed to fetch zip code for address ${prefecture} ${city}: ${e}`);
             return null;
         }
     }
@@ -398,15 +438,43 @@ function api_updateCustomer(id, data) {
 }
 /**
  * API: Get Address by Zip Code
+ * Returns an array of addresses (some zip codes have multiple cities)
  */
 function api_getAddressByZipCode(zipCode) {
     try {
         const service = new CustomerService_1.CustomerService();
-        const result = service.getAddressByZipCode(zipCode);
-        if (!result) {
+        const results = service.getAddressByZipCode(zipCode);
+        if (!results || results.length === 0) {
             return JSON.stringify({
                 status: 'error',
                 message: 'Address not found or invalid zip code'
+            });
+        }
+        return JSON.stringify({
+            status: 'success',
+            data: results // Now returns an array
+        });
+    }
+    catch (error) {
+        Logger.log('Error in api_getAddressByZipCode: ' + error.message);
+        return JSON.stringify({
+            status: 'error',
+            message: error.message
+        });
+    }
+}
+/**
+ * API: Get Zip Code by Address (Reverse lookup)
+ * Requires GOOGLE_MAPS_API_KEY in Script Properties
+ */
+function api_getZipCodeByAddress(prefecture, city, address1) {
+    try {
+        const service = new CustomerService_1.CustomerService();
+        const result = service.getZipCodeByAddress(prefecture, city, address1);
+        if (!result) {
+            return JSON.stringify({
+                status: 'error',
+                message: 'Zip code not found for the given address'
             });
         }
         return JSON.stringify({
@@ -415,7 +483,7 @@ function api_getAddressByZipCode(zipCode) {
         });
     }
     catch (error) {
-        Logger.log('Error in api_getAddressByZipCode: ' + error.message);
+        Logger.log('Error in api_getZipCodeByAddress: ' + error.message);
         return JSON.stringify({
             status: 'error',
             message: error.message
@@ -433,6 +501,7 @@ globalThis.api_getCustomerById = api_getCustomerById;
 globalThis.api_createCustomer = api_createCustomer;
 globalThis.api_updateCustomer = api_updateCustomer;
 globalThis.api_getAddressByZipCode = api_getAddressByZipCode;
+globalThis.api_getZipCodeByAddress = api_getZipCodeByAddress;
 
 })();
 
@@ -481,4 +550,9 @@ function api_updateCustomer(...args) {
 
 function api_getAddressByZipCode(...args) {
   return globalThis.api_getAddressByZipCode(...args);
+}
+
+
+function api_getZipCodeByAddress(...args) {
+  return globalThis.api_getZipCodeByAddress(...args);
 }

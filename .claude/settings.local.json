@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git worktree:*)",
+      "Bash(npm ci:*)",
+      "Bash(git branch:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(clasp push:*)",
+      "Bash(clasp login:*)",
+      "Bash(clasp deploy:*)",
+      "Bash(clasp deployments:*)",
+      "Bash(npx playwright install chromium)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(cat:*)",
+      "Bash(clasp list:*)",
+      "Bash(clasp logout:*)",
+      "Bash(clasp status:*)",
+      "Bash($env:DEMO_URL=\"https://script.google.com/macros/s/AKfycbxeouUQ6CygGX8OFww_pj0tlaYwrm6B0ldGqhsPkkzc1uhvowyg6nZkyKrffaEPFimm/exec?demo=address\")",
+      "Bash(node scripts/verify-address-demo.js:*)",
+      "Bash(DEMO_URL=\"https://script.google.com/macros/s/AKfycbxeouUQ6CygGX8OFww_pj0tlaYwrm6B0ldGqhsPkkzc1uhvowyg6nZkyKrffaEPFimm/exec?demo=address\" node:*)",
+      "Bash($env:DEMO_URL=\"https://script.google.com/macros/s/AKfycbwHOefbXQDWk4hdlLIiWZLM1xLyaPJd1p6YJ5NSIe5qQKAEY8dKhBcnhRp6ol9fCBRkHA/exec?demo=address\")",
+      "Bash(set \"DEMO_URL=https://script.google.com/macros/s/AKfycbwHOefbXQDWk4hdlLIiWZLM1xLyaPJd1p6YJ5NSIe5qQKAEY8dKhBcnhRp6ol9fCBRkHA/exec?demo=address\")",
+      "Bash(copy address_lookup_demo.html distaddress_lookup_demo.html)",
+      "Bash(node scripts/deploy-to-crm-v9.js:*)",
+      "Bash(timeout:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
