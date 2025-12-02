@@ -22,6 +22,7 @@ export const CustomerForm = () => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(false);
   const [error, setError] = useState('');
+  const [addressCandidates, setAddressCandidates] = useState<Array<{ prefecture: string; city: string; address1: string }>>([]);
 
   useEffect(() => {
     if (isEditMode) {
@@ -141,20 +142,29 @@ export const CustomerForm = () => {
                   onClick={async () => {
                     if (!formData.zipCode) return;
                     try {
-                      const address = await runGAS<any>('api_getAddressByZipCode', formData.zipCode);
-                      if (address) {
-                        setFormData(prev => ({
-                          ...prev,
-                          prefecture: address.prefecture,
-                          city: address.city,
-                          address1: address.address1
-                        }));
+                      const addresses = await runGAS<any>('api_getAddressByZipCode', formData.zipCode);
+                      if (addresses && addresses.length > 0) {
+                        if (addresses.length === 1) {
+                          // Single match - auto-fill
+                          setFormData(prev => ({
+                            ...prev,
+                            prefecture: addresses[0].prefecture,
+                            city: addresses[0].city,
+                            address1: addresses[0].address1
+                          }));
+                          setAddressCandidates([]);
+                        } else {
+                          // Multiple matches - show selection UI
+                          setAddressCandidates(addresses);
+                        }
                       } else {
                         alert('Address not found');
+                        setAddressCandidates([]);
                       }
                     } catch (e) {
                       console.error(e);
                       alert('Failed to lookup address');
+                      setAddressCandidates([]);
                     }
                   }}
                   style={{
@@ -167,10 +177,54 @@ export const CustomerForm = () => {
                     borderRadius: '4px'
                   }}
                 >
-                  Lookup
+                  Lookup Address
                 </button>
               </div>
             </div>
+
+            {/* Multiple Address Candidates Selection */}
+            {addressCandidates.length > 0 && (
+              <div style={{
+                marginBottom: '15px',
+                padding: '10px',
+                backgroundColor: '#f0f8ff',
+                border: '1px solid #4CAF50',
+                borderRadius: '4px'
+              }}>
+                <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', color: '#333' }}>
+                  Multiple addresses found. Please select one:
+                </p>
+                {addressCandidates.map((candidate, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => {
+                      setFormData(prev => ({
+                        ...prev,
+                        prefecture: candidate.prefecture,
+                        city: candidate.city,
+                        address1: candidate.address1
+                      }));
+                      setAddressCandidates([]);
+                    }}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      padding: '10px',
+                      marginBottom: '8px',
+                      fontSize: '14px',
+                      textAlign: 'left',
+                      backgroundColor: 'white',
+                      border: '1px solid #ddd',
+                      cursor: 'pointer',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    {candidate.prefecture} {candidate.city} {candidate.address1}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
               <div style={{ flex: 1 }}>
@@ -194,6 +248,42 @@ export const CustomerForm = () => {
                 />
               </div>
             </div>
+
+            {/* Reverse Lookup Button */}
+            {formData.prefecture && formData.city && !formData.zipCode && (
+              <div style={{ marginBottom: '15px' }}>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const zipCode = await runGAS<any>('api_getZipCodeByAddress', formData.prefecture, formData.city, formData.address1 || '');
+                      if (zipCode) {
+                        setFormData(prev => ({
+                          ...prev,
+                          zipCode: zipCode
+                        }));
+                      } else {
+                        alert('Zip code not found for this address');
+                      }
+                    } catch (e) {
+                      console.error(e);
+                      alert('Failed to lookup zip code. Make sure GOOGLE_MAPS_API_KEY is configured.');
+                    }
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    backgroundColor: '#2196F3',
+                    color: 'white',
+                    border: 'none',
+                    cursor: 'pointer',
+                    borderRadius: '4px'
+                  }}
+                >
+                  ← Lookup Zip Code
+                </button>
+              </div>
+            )}
 
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Address 1 (Street)</label>

@@ -175,3 +175,8 @@ dist/
 | 2025-12-02 | DOC | AI Squad体制の明確化 (`DIRECTOR_INSTRUCTIONS.md`, `AUDITOR_CHECKLIST.md`) | ✅ Done |
 | 2025-12-02 | DEPLOY | 住所検索デモのCRM V9 Systemへのデプロイ完了 (v12, commit 1b5505f) | ✅ Done |
 | 2025-12-02 | DOC | デプロイレポート作成 (`DEPLOYMENT_REPORT.md`) + Playwright検証スクリプト | ✅ Done |
+| 2025-12-02 | MERGE | Phase 2 (Address Lookup Demo) を mainブランチにマージ完了 | ✅ Done |
+| 2025-12-02 | SETUP | Phase 3 Frontend Setup 開始 - Git Worktree作成、依存関係同期 | ✅ Done |
+| 2025-12-02 | FEAT | Material UI & React Router インストール完了 (frontend: 46 packages added) | ✅ Done |
+| 2025-12-02 | BUILD | Frontend ビルド検証完了 (Vite: 1.20s, Bundle: 462.69 KB) | ✅ Done |
+| 2025-12-02 | BUILD | 統合ビルド検証完了 (Backend 18.8 KiB, 10 API functions bridged) | ✅ Done |
