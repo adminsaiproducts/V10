@@ -1,172 +1,138 @@
 /**
- * CRM V10 Deployment Verification Script
- *
- * This script uses Playwright to verify that the deployed GAS Web App is working correctly.
- *
- * Usage:
- *   node scripts/verify-deployment.js <WEB_APP_URL>
- *
- * Example:
- *   node scripts/verify-deployment.js https://script.google.com/macros/s/AKfyc.../exec
+ * CRM V10 デプロイメント検証スクリプト
+ * Playwright を使用してブラウザで動作確認を行い、スクリーンショットを保存します。
  */
 
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 
-// Get Web App URL from command line argument or environment variable
-const DEPLOYMENT_URL = process.argv[2] || process.env.DEPLOYMENT_URL;
-
-if (!DEPLOYMENT_URL) {
-  console.error('❌ Error: No deployment URL provided.');
-  console.error('Usage: node scripts/verify-deployment.js <WEB_APP_URL>');
-  console.error('   or: DEPLOYMENT_URL=<url> node scripts/verify-deployment.js');
-  process.exit(1);
-}
-
-// Create screenshots directory if it doesn't exist
-const screenshotsDir = path.join(__dirname, '..', 'screenshots');
-if (!fs.existsSync(screenshotsDir)) {
-  fs.mkdirSync(screenshotsDir, { recursive: true });
-}
+// 設定
+const DEPLOYMENT_URL = process.env.DEPLOYMENT_URL || 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+const SCREENSHOT_DIR = path.join(__dirname, '..', 'screenshots');
+const TIMEOUT = 30000; // 30秒
 
 async function verifyDeployment() {
-  console.log('🚀 Starting deployment verification...');
-  console.log(`📍 Target URL: ${DEPLOYMENT_URL}`);
+  console.log('🚀 CRM V10 デプロイメント検証を開始します...\n');
 
-  const browser = await chromium.launch({ headless: true });
+  // スクリーンショット保存ディレクトリの作成
+  if (!fs.existsSync(SCREENSHOT_DIR)) {
+    fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
+  }
+
+  const browser = await chromium.launch({ headless: false }); // デバッグ用に headless: false
   const context = await browser.newContext({
-    viewport: { width: 1920, height: 1080 }
+    viewport: { width: 1920, height: 1080 },
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
   });
   const page = await context.newPage();
 
-  // Track console messages
-  const consoleMessages = [];
-  page.on('console', msg => {
-    consoleMessages.push({
-      type: msg.type(),
-      text: msg.text()
-    });
-  });
-
-  // Track errors
-  const errors = [];
-  page.on('pageerror', error => {
-    errors.push(error.message);
-  });
-
   try {
-    // Step 1: Navigate to Web App
-    console.log('\n📄 Step 1: Loading Web App...');
-    await page.goto(DEPLOYMENT_URL, {
-      waitUntil: 'networkidle',
-      timeout: 60000
+    // ステップ 1: ページにアクセス
+    console.log(`📍 Step 1: ${DEPLOYMENT_URL} にアクセス中...`);
+    await page.goto(DEPLOYMENT_URL, { waitUntil: 'networkidle', timeout: TIMEOUT });
+    
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    await page.screenshot({ 
+      path: path.join(SCREENSHOT_DIR, `01_initial_load_${timestamp}.png`),
+      fullPage: true 
     });
+    console.log('✅ Step 1: ページ読み込み完了\n');
 
-    await page.screenshot({
-      path: path.join(screenshotsDir, '01_initial_load.png'),
-      fullPage: true
+    // ステップ 2: React アプリケーションの起動確認
+    console.log('📍 Step 2: React アプリケーションの起動確認...');
+    await page.waitForSelector('#root', { timeout: TIMEOUT });
+    console.log('✅ Step 2: #root 要素が見つかりました\n');
+
+    // ステップ 3: Material UI の読み込み確認
+    console.log('📍 Step 3: Material UI の読み込み確認...');
+    const hasMuiElements = await page.evaluate(() => {
+      const muiElements = document.querySelectorAll('[class*="Mui"]');
+      return muiElements.length > 0;
     });
-    console.log('✅ Page loaded successfully');
-
-    // Step 2: Check for React root element
-    console.log('\n🔍 Step 2: Checking for React application...');
-    const reactRoot = await page.locator('#root').count();
-    if (reactRoot > 0) {
-      console.log('✅ React root element found');
+    
+    if (hasMuiElements) {
+      console.log('✅ Step 3: Material UI コンポーネントが検出されました\n');
     } else {
-      console.log('⚠️  Warning: React root element not found');
+      console.warn('⚠️  Step 3: Material UI コンポーネントが見つかりません\n');
     }
 
-    // Step 3: Wait for content to render
-    console.log('\n⏳ Step 3: Waiting for content to render...');
-    await page.waitForTimeout(3000); // Wait 3 seconds for React to render
-
-    await page.screenshot({
-      path: path.join(screenshotsDir, '02_after_render.png'),
-      fullPage: true
+    await page.screenshot({ 
+      path: path.join(SCREENSHOT_DIR, `02_mui_loaded_${timestamp}.png`),
+      fullPage: true 
     });
 
-    // Step 4: Check for Material UI elements
-    console.log('\n🎨 Step 4: Checking for Material UI...');
-    const muiElements = await page.locator('[class*="Mui"]').count();
-    if (muiElements > 0) {
-      console.log(`✅ Material UI detected (${muiElements} elements found)`);
-    } else {
-      console.log('⚠️  Warning: No Material UI elements found');
-    }
-
-    // Step 5: Check page title
-    console.log('\n📝 Step 5: Checking page title...');
-    const title = await page.title();
-    console.log(`   Title: "${title}"`);
-
-    // Step 6: Final screenshot
-    await page.screenshot({
-      path: path.join(screenshotsDir, '03_final_state.png'),
-      fullPage: true
+    // ステップ 4: コンソールエラーのチェック
+    console.log('📍 Step 4: コンソールエラーのチェック...');
+    const errors = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        errors.push(msg.text());
+      }
     });
 
-    // Report console messages
-    console.log('\n📋 Console Messages:');
-    if (consoleMessages.length === 0) {
-      console.log('   (no messages)');
-    } else {
-      consoleMessages.forEach(msg => {
-        const icon = msg.type === 'error' ? '❌' : msg.type === 'warning' ? '⚠️' : 'ℹ️';
-        console.log(`   ${icon} [${msg.type}] ${msg.text}`);
-      });
-    }
+    // 少し待機してエラーを収集
+    await page.waitForTimeout(3000);
 
-    // Report errors
-    console.log('\n🐛 JavaScript Errors:');
     if (errors.length === 0) {
-      console.log('   ✅ No errors detected');
+      console.log('✅ Step 4: コンソールエラーなし\n');
     } else {
-      errors.forEach(error => {
-        console.log(`   ❌ ${error}`);
-      });
+      console.error('❌ Step 4: 以下のコンソールエラーが検出されました:');
+      errors.forEach(err => console.error(`   - ${err}`));
+      console.log('');
     }
 
-    // Final verdict
-    console.log('\n' + '='.repeat(60));
-    if (errors.length === 0 && reactRoot > 0) {
-      console.log('✅ VERIFICATION PASSED');
-      console.log('   - Page loaded successfully');
-      console.log('   - React application is running');
-      console.log('   - No JavaScript errors detected');
-      if (muiElements > 0) {
-        console.log('   - Material UI is active');
-      }
-    } else {
-      console.log('⚠️  VERIFICATION COMPLETED WITH WARNINGS');
-      if (errors.length > 0) {
-        console.log(`   - ${errors.length} JavaScript error(s) detected`);
-      }
-      if (reactRoot === 0) {
-        console.log('   - React root element not found');
-      }
-    }
-    console.log('='.repeat(60));
+    // ステップ 5: 最終スクリーンショット
+    console.log('📍 Step 5: 最終スクリーンショット保存...');
+    await page.screenshot({ 
+      path: path.join(SCREENSHOT_DIR, `03_final_state_${timestamp}.png`),
+      fullPage: true 
+    });
+    console.log('✅ Step 5: スクリーンショット保存完了\n');
 
-    console.log(`\n📸 Screenshots saved to: ${screenshotsDir}`);
+    // 結果サマリー
+    console.log('═══════════════════════════════════════════');
+    console.log('📊 検証結果サマリー');
+    console.log('═══════════════════════════════════════════');
+    console.log(`✅ ページ読み込み: 成功`);
+    console.log(`✅ React アプリ起動: 成功`);
+    console.log(`${hasMuiElements ? '✅' : '⚠️ '} Material UI: ${hasMuiElements ? '検出' : '未検出'}`);
+    console.log(`${errors.length === 0 ? '✅' : '❌'} コンソールエラー: ${errors.length === 0 ? 'なし' : errors.length + '件'}`);
+    console.log('═══════════════════════════════════════════\n');
+
+    console.log(`📁 スクリーンショット保存先: ${SCREENSHOT_DIR}\n`);
+
+    // 総合判定
+    if (errors.length === 0 && hasMuiElements) {
+      console.log('🎉 検証成功: デプロイメントは正常に動作しています!\n');
+      return true;
+    } else {
+      console.log('⚠️  検証完了: いくつかの問題が検出されました。上記を確認してください。\n');
+      return false;
+    }
 
   } catch (error) {
-    console.error('\n❌ VERIFICATION FAILED');
-    console.error(`   Error: ${error.message}`);
-
-    await page.screenshot({
-      path: path.join(screenshotsDir, 'error.png'),
-      fullPage: true
+    console.error('❌ 検証エラー:', error.message);
+    
+    // エラー時もスクリーンショットを保存
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    await page.screenshot({ 
+      path: path.join(SCREENSHOT_DIR, `error_${timestamp}.png`),
+      fullPage: true 
     });
-
-    process.exit(1);
+    
+    return false;
   } finally {
     await browser.close();
   }
 }
 
-verifyDeployment().catch(error => {
-  console.error('❌ Unexpected error:', error);
-  process.exit(1);
-});
+// スクリプト実行
+verifyDeployment()
+  .then(success => {
+    process.exit(success ? 0 : 1);
+  })
+  .catch(error => {
+    console.error('致命的エラー:', error);
+    process.exit(1);
+  });

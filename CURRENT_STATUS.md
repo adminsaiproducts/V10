@@ -1,10 +1,13 @@
 
-| プロパティ名 | 設定値 |
-| :--- | :--- |
-| `FIRESTORE_PROJECT_ID` | `crm-appsheet-v7` |
-| `FIRESTORE_DATABASE_ID` | `crm-database-v9` |
-| `FIRESTORE_EMAIL` | `crm-v7-automation@crm-appsheet-v7.iam.gserviceaccount.com` |
-| `FIRESTORE_KEY` | `config/serviceAccount.json` の `private_key` 全文 |
+| プロパティ名 | 設定値 | 用途 |
+| :--- | :--- | :--- |
+| `FIRESTORE_PROJECT_ID` | `crm-appsheet-v7` | Firestoreプロジェクト識別 |
+| `FIRESTORE_DATABASE_ID` | `crm-database-v9` | Firestoreデータベース識別 |
+| `FIRESTORE_EMAIL` | `crm-v7-automation@crm-appsheet-v7.iam.gserviceaccount.com` | サービスアカウント認証 |
+| `FIRESTORE_KEY` | `config/serviceAccount.json` の `private_key` 全文 | サービスアカウント秘密鍵 |
+| `GOOGLE_MAPS_API_KEY` | `AIzaSyAYUikfoE-EUb187g-5ZemY-P4ZfdMQzlw` | 住所検索 (Geocoding API) |
+
+**注意**: `GOOGLE_MAPS_API_KEY` は CRM V9 System のみに設定されています。Phase 3 Frontend (V10) では未設定です。
 
 ## 🏗️ ビルドシステム構成 (3-File Pattern)
 
@@ -57,32 +60,86 @@ dist/
 ### Phase 4: Usability Enhancement ✅
 16. **Search Functionality:** 顧客検索機能の実装（Backend: `searchCustomers`, Frontend: Search UI）
 
-### Phase 5: Frontend Modernization ✅
-17. **Material UI Integration:** Material UI v5 の導入（@mui/material, @emotion/react, @emotion/styled, @mui/icons-material）
-18. **React Router Integration:** React Router v6 の導入（react-router-dom）
-19. **Build Verification:** Frontend + Backend 統合ビルドの成功確認
-20. **Deployment:** GAS プロジェクトへのデプロイ成功（デプロイID: @5）
-21. **RPA Infrastructure:** Playwright ベースの自動検証スクリプト作成（scripts/verify-deployment.js）
+### Phase 5: Advanced Features (In Progress)
+17. **Address Lookup Backend:** 双方向住所検索API実装 (CRM V9 System) ✅
+    - **実装日**: 2025-12-02
+    - **場所**: CRM V9 System (`AddressLookup.gs`)
+    - **API機能**:
+      - `api_getAddressByZipCode(zipCode)`: 郵便番号→住所 (Zipcloud API使用、無料)
+      - `api_getZipCodeByAddress(prefecture, city, address1)`: 住所→郵便番号 (Google Maps Geocoding API使用)
+    - **設定完了**:
+      - Google Cloud Platform: Geocoding API有効化済み
+      - Script Properties: `GOOGLE_MAPS_API_KEY` 設定済み
+      - API Key制限: `script.google.com` のみ許可
+    - **テスト結果**: 全5テスト合格
+      - ✅ 郵便番号→住所検索 (100-0005 → 東京都千代田区丸の内)
+      - ✅ 住所→郵便番号検索 (東京都千代田区丸の内1-9-1 → 1006701)
+      - ✅ 不正入力のエラーハンドリング
+      - ✅ Nullパラメータ処理
+      - ✅ API Key設定確認
+    - **ドキュメント**: `GOOGLE_MAPS_API_SETUP.md`, `ADDRESS_LOOKUP_IMPLEMENTATION.md`
 
-### Phase 6: Enhanced Address Lookup ✅
-22. **Bidirectional Address Lookup:** 郵便番号→住所と住所→郵便番号の双方向検索機能実装
-23. **Multiple Candidates UI:** 郵便番号から複数の住所候補がある場合の選択UI実装
-24. **Google Maps Integration:** Google Maps Geocoding API を使用した逆引き（住所→郵便番号）機能
-25. **Backend API Enhancement:** `api_getAddressByZipCode` の配列対応、`api_getZipCodeByAddress` の新規実装
-26. **Deployment:** GAS プロジェクトへのデプロイ成功（デプロイID: @7）
+18. **Address Lookup Frontend Demo:** デモページ作成 (AI Squad体制) ✅
+    - **実装日**: 2025-12-02
+    - **ファイル**: `address_lookup_demo.html` (紫色グラデーションUI、モダンデザイン)
+    - **Planner (Claude Code) 担当**:
+      - ✅ `address_lookup_demo.html` 作成 (双方向検索UI)
+      - ✅ `DIRECTOR_INSTRUCTIONS.md` 作成 (デプロイ手順書、7タスク、SS1-SS7)
+      - ✅ `AUDITOR_CHECKLIST.md` 作成 (ChatGPT向けレビューチェックリスト)
+      - ✅ `ADDRESS_LOOKUP_DEPLOYMENT.md` 作成 (技術ガイド)
+      - ✅ Git記録 (branch: `feat/address-lookup`, 3 commits)
+    - **Director (Claude Code) 担当**:
+      - ✅ CRM V9 System へのHTMLファイル追加 (address_lookup_demo.html)
+      - ✅ `doGet` 関数の更新 (デモパラメータ対応、既存コード確認済み)
+      - ✅ デプロイとURL取得 (v12, AKfycbwTIZxHE1Ekqzq6J76hjsFDO4jUOcbeGITrUFzYC1DSc4k2RAccC5NVb5_wWcrH3eVV)
+      - ✅ UI表示確認 (Playwright検証、SS4スクリーンショット取得)
+      - ✅ デプロイレポート作成 (`DEPLOYMENT_REPORT.md`)
+      - ✅ Git記録 (commit 1b5505f, 30 files changed, 4577 insertions)
+      - ⏳ 機能テスト実行 (郵便番号検索、住所検索、エラーハンドリング) - Auditorレビュー待ち
+    - **Auditor (ChatGPT) 担当**:
+      - ⏳ Director作業のレビュー実施
+      - ⏳ セキュリティ・パフォーマンス・ユーザビリティの検証
+      - ⏳ 改善提案の作成
+      - ⏳ レビューレポート作成
+    - **AI Squad体制**: `PROJECT_MANIFEST.md` Section 1 に基づく役割分担を明確化
 
-## 📝 次のステップ (Phase 7: UI Enhancement)
+## 📝 次のステップ (Phase 5: Advanced Features - Continued)
 
 ### 優先タスク
+1.  **Address Lookup Demo Deployment:** Director によるデプロイ実行 ✅
+    - **実行者**: Director (Claude Code)
+    - **デプロイURL**: https://script.google.com/macros/s/AKfycbwTIZxHE1Ekqzq6J76hjsFDO4jUOcbeGITrUFzYC1DSc4k2RAccC5NVb5_wWcrH3eVV/exec?demo=address
+    - **成果物**:
+      - ✅ デプロイレポート (`DEPLOYMENT_REPORT.md`)
+      - ✅ スクリーンショット (SS4 - 初期ページ表示)
+      - ✅ Playwright検証スクリプト (`scripts/verify-address-demo.js`)
+      - ✅ RPA自動化スクリプト (`scripts/deploy-to-crm-v9.js`)
+    - **完了日**: 2025-12-02
+    - **次のステップ**: Auditor (ChatGPT) によるレビュー
+
+2.  **Address Lookup Demo Review:** Auditor によるレビュー実行 ⏳
+    - **実行者**: Auditor (ChatGPT)
+    - **チェックリスト**: `AUDITOR_CHECKLIST.md` を参照
+    - **成果物**: レビューレポート + 改善提案
+    - **次のステップ**: Phase 3 Frontend への統合検討
+
+3.  **Phase 3 Frontend Integration:** 顧客フォームへの住所検索統合 ⏸️
+    - **前提条件**: デモが成功し、Auditor承認済み
+    - **実装内容**: 顧客作成/編集フォームに住所検索UIを追加
+    - **Material UI化**: デザインを Phase 3 Frontend のスタイルに統一
+
+### 完了した優先タスク
 1.  **Pagination:** 50件制限の解除、ページネーション実装 ✅
 2.  **Customer Detail View:** 顧客詳細画面の実装 ✅
 3.  **Error Handling:** フロントエンドのエラー表示改善 ✅
+4.  **CRUD Operations:** 顧客の作成・更新機能 ✅
 
 ### 将来的な拡張
-- **CRUD Operations:** 顧客の作成・更新・削除機能
+- **Address Lookup Integration:** 顧客フォームへの住所検索統合 (Backend完了、Frontend保留)
 - **Relationships Display:** 顧客間の関係性表示
 - **Deals Integration:** 顧客に紐づく案件表示
 - **Performance Optimization:** Virtual Scrolling, Cache最適化
+- **Customer Delete:** 顧客削除機能の実装
 
 ## 🔧 既知の課題
 
@@ -93,11 +150,12 @@ dist/
 
 ### Technical Debt
 - `clasp push` が "already up to date" を返し続ける問題（手動確認が必要）
+- フロントエンドが Material UI を含まない簡易版（Phase 3 で簡略化）
 
 ### 改善候補
-- Material UI コンポーネントへの既存UIのリファクタリング
-- React Router によるページ遷移の実装
-- RPA 検証の自動化（CI/CD パイプライン統合）
+- Material UI の再導入（デザイン改善）
+- React Router の再導入（ページ遷移）
+- エラーハンドリングの強化
 
 ## 🕒 最新の変更履歴 (Changelog)
 | Date | Type | Details | Status |
@@ -112,9 +170,8 @@ dist/
 | 2025-11-30 | FEAT | 顧客作成機能の実装 (Backend: `api_createCustomer`, Frontend: `CustomerForm`) | ✅ Done |
 | 2025-11-30 | FEAT | 顧客更新機能の実装 (Backend: `api_updateCustomer`, Frontend: Edit UI) | ✅ Done |
 | 2025-12-01 | FEAT | 住所自動入力機能 (Zipcode Lookup) と住所フィールドの実装 | ✅ Done |
-| 2025-12-02 | FEAT | Phase 5: Frontend Modernization - Material UI & React Router の導入 | ✅ Done |
-| 2025-12-02 | INFRA | Playwright ベースの RPA 検証スクリプト作成 (scripts/verify-deployment.js) | ✅ Done |
-| 2025-12-02 | DEPLOY | GAS プロジェクトへのデプロイ成功（デプロイID: @5） | ✅ Done |
-| 2025-12-02 | FEAT | Phase 6: Enhanced Address Lookup - 双方向検索と複数候補選択UI | ✅ Done |
-| 2025-12-02 | API | 郵便番号→住所（複数候補対応）、住所→郵便番号（Google Maps Geocoding API）の実装 | ✅ Done |
-| 2025-12-02 | DEPLOY | GAS プロジェクトへのデプロイ成功（デプロイID: @7） | ✅ Done |
+| 2025-12-02 | FEAT | 双方向住所検索API実装 (CRM V9 System) - Backend完了 | ✅ Done |
+| 2025-12-02 | FEAT | 住所検索デモUI作成 (`address_lookup_demo.html`) | ✅ Done |
+| 2025-12-02 | DOC | AI Squad体制の明確化 (`DIRECTOR_INSTRUCTIONS.md`, `AUDITOR_CHECKLIST.md`) | ✅ Done |
+| 2025-12-02 | DEPLOY | 住所検索デモのCRM V9 Systemへのデプロイ完了 (v12, commit 1b5505f) | ✅ Done |
+| 2025-12-02 | DOC | デプロイレポート作成 (`DEPLOYMENT_REPORT.md`) + Playwright検証スクリプト | ✅ Done |
