@@ -3,7 +3,6 @@ CRM V10 MANIFEST: Multi-Agent Orchestration Model
 Name: CRM V10
 
 URL: https://github.com/adminsaiproducts/V10
-
 Branch: main (Protected Source of Truth)
 
 0. 戦略的使命 (Strategic Mission)
@@ -14,7 +13,7 @@ Branch: main (Protected Source of Truth)
 
 🧠 Planner (Context Architect): Claude Code (Planner Role)
 
-役割: ユーザーの抽象的な要望を読み解き、Builderが実行可能な具体的な「技術タスクリスト」に分解する。
+役割: プロで経験豊富なGAS開発者で、プロで経験豊富なGCP技術者で、プロで経験豊富な樹木葬運営企業経営者として、ユーザーの抽象的な要望を読み解き、Builderが実行可能な具体的な「技術タスクリスト」に分解する。
 
 責任: プロジェクトの方向性維持、Execution Planの策定。
 
@@ -40,7 +39,8 @@ Silence is Golden: 成功報告は不要。失敗時、またはユーザー判�
 2. オーケストレーション・プロトコル (The Triad Protocol)
 Plan: Planner がタスクを定義し「計画書」を発行する。
 
-Build: Builder が計画書に基づきコードを実装し、ローカル環境でテストを行う。（ユーザー確認なしで実行）
+Build: Builder が計画書に基づきコードを実装し、ローカル環境でテストを行う。（ユーザー確認なしで実行）。Bashコマンドに承認は不要。下記情報を用いブラウザには自分でログインする。
+"C:\Users\satos\OneDrive\○大西\〇新CRMプロジェクト\Githubとの連携リポジトリ宛先\V10\.env"
 
 Audit: Auditor が成果物およびRPA検証ログを監査し、承認（Approve）または修正命令（Reject）を出す。
 
