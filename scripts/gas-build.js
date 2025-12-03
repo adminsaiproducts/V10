@@ -67,8 +67,23 @@ try {
   // 2. javascript.html (with <script> wrapper)
   // 3. stylesheet.html (with <style> wrapper)
 
-  // javascript.html
-  const jsTemplate = `<script>\n${jsContent}\n</script>`;
+  // GAS HtmlService processes :// patterns even in createHtmlOutputFromFile
+  // To avoid this, we encode the JavaScript as Base64 and decode it at runtime
+
+  // Encode JavaScript content as Base64
+  const jsBase64 = Buffer.from(jsContent, 'utf8').toString('base64');
+
+  // Create a bootstrap script that decodes and executes the Base64 content
+  // Using a self-executing function to avoid polluting global scope
+  const jsTemplate = `<script>
+(function() {
+  var encoded = "${jsBase64}";
+  var decoded = atob(encoded);
+  var script = document.createElement('script');
+  script.textContent = decoded;
+  document.head.appendChild(script);
+})();
+</script>`;
   fs.writeFileSync(path.join(distDir, 'javascript.html'), jsTemplate, 'utf8');
 
   // stylesheet.html

@@ -1,3 +1,2 @@
-**/*
-!dist/**
-dist/assets/**
+assets/**
+.clasp.json

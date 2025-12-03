@@ -1,18 +1,18 @@
 {
   "timeZone": "Asia/Tokyo",
   "dependencies": {
-    "enabledAdvancedServices": [],
-    "libraries": [{
-      "userSymbol": "FirestoreApp",
-      "version": "30",
-      "libraryId": "1VUSl4b1r1eoNcRWotZC3eKSKSZQiCCm_7k48HEDLCn2Nw9FwD8p4odIq",
-      "developmentMode": false
-    }]
+    "libraries": [
+      {
+        "userSymbol": "FirestoreApp",
+        "version": "30",
+        "libraryId": "1VUSl4b1r1eoNcRWotZM3e87ygkxvXltOgyDZhixqncz9lQ3MjfT1iKFw"
+      }
+    ]
   },
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
   "webapp": {
-    "executeAs": "USER_DEPLOYING",
-    "access": "ANYONE"
+    "access": "ANYONE",
+    "executeAs": "USER_DEPLOYING"
   }
 }

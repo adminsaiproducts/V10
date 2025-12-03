@@ -3,12 +3,32 @@ import { CustomerService } from './services/CustomerService';
 
 /**
  * doGet - Serves the web application
+ * Note: We avoid createTemplateFromFile because its scriptlet processing
+ * breaks JavaScript code containing :// patterns (treats them as comments)
  */
 function doGet(e: GoogleAppsScript.Events.DoGet) {
   try {
     Logger.log('doGet called with parameters: ' + JSON.stringify(e.parameter));
-    const template = HtmlService.createTemplateFromFile('index');
-    return template.evaluate()
+
+    // Build HTML directly without scriptlet processing
+    const stylesheet = HtmlService.createHtmlOutputFromFile('stylesheet').getContent();
+    const javascript = HtmlService.createHtmlOutputFromFile('javascript').getContent();
+
+    const html = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRM V10</title>
+  ${stylesheet}
+</head>
+<body>
+  <div id="root"></div>
+  ${javascript}
+</body>
+</html>`;
+
+    return HtmlService.createHtmlOutput(html)
       .setTitle('CRM V10')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
